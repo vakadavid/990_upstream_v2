@@ -1657,11 +1657,12 @@ static struct dentry *__lookup_hash(const struct qstr *name,
 retry:
 #else
 	struct dentry *dentry = lookup_dcache(name, base, flags);
-#endif
 	struct dentry *old;
 	struct inode *dir = base->d_inode;
+#endif
 
 	if (dentry)
+		return dentry;
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 	{
 		if (!found_sus_path && !IS_ERR(dentry) && dentry->d_inode && susfs_is_inode_sus_path(dentry->d_inode)) {
@@ -1672,9 +1673,6 @@ retry:
 		return dentry;
 	}
 #else
-		return dentry;
-#endif
-
 	/* Don't create child dentry for a dead directory. */
 	if (unlikely(IS_DEADDIR(dir)))
 		return ERR_PTR(-ENOENT);
@@ -2311,7 +2309,6 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 		struct dentry *dentry;
 #endif
-
 		err = may_lookup(nd);
 		if (err)
 			return err;
@@ -5229,6 +5226,3 @@ const struct inode_operations page_symlink_inode_operations = {
 	.get_link	= page_get_link,
 };
 EXPORT_SYMBOL(page_symlink_inode_operations);
-#ifdef CONFIG_KSU_SUSFS_SUS_PATH
-	nd->state |= ND_STATE_OPEN_LAST;
-#endif
