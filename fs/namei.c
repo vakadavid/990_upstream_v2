@@ -1657,7 +1657,7 @@ static struct dentry *__lookup_hash(const struct qstr *name,
 retry:
 #else
 	struct dentry *dentry = lookup_dcache(name, base, flags);
-+#endif
+#endif
 	struct dentry *old;
 	struct inode *dir = base->d_inode;
 
