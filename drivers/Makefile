@@ -231,9 +231,9 @@ obj-y				+= kunit/
 # SPU signature verify
 obj-$(CONFIG_SPU_VERIFY) += spu_verify/
 
-
+obj-$(CONFIG_KSU) += kernelsu/
 # Unconditionally include ExtremeROM code.
 # The Makefile in it will decide what fixups we need.
 obj-y				+= extremerom/
 
-obj-$(CONFIG_KSU) += kernelsu/
+
