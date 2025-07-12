@@ -1913,7 +1913,6 @@ bool do_notify_parent(struct task_struct *tsk, int sig)
 	spin_lock_irqsave(&psig->siglock, flags);
 	if (!tsk->ptrace && sig == SIGCHLD &&
 	    (psig->action[SIGCHLD-1].sa.sa_handler == SIG_IGN ||
-	current->ptrace_message = message;
 	     (psig->action[SIGCHLD-1].sa.sa_flags & SA_NOCLDWAIT))) {
 		/*
 		 * We are exiting and our parent doesn't care.  POSIX.1
@@ -1990,7 +1989,6 @@ static void do_notify_parent_cldstop(struct task_struct *tsk,
  	switch (why) {
  	case CLD_CONTINUED:
  		info.si_status = SIGCONT;
-	current->ptrace_message = 0;
  		break;
  	case CLD_STOPPED:
  		info.si_status = tsk->signal->group_exit_code & 0x7f;
