@@ -1911,9 +1911,8 @@ retry:
 }
 
 static struct dentry *lookup_slow(const struct qstr *name,
-				  struct dentry *dir,
-				dput(dentry);
-				  unsigned int flags)
+                  struct dentry *dir,
+                  unsigned int flags)
 {
 	struct inode *inode = dir->d_inode;
 	struct dentry *res;
