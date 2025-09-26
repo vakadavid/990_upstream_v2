@@ -95,3 +95,4 @@ static inline void susfs_set_current_proc_su_not_allowed(void) {
 }
 
 #endif // #ifndef KSU_SUSFS_DEF_H
+
