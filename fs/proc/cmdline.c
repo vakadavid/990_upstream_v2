@@ -24,8 +24,7 @@ static int cmdline_proc_show(struct seq_file *m, void *v)
 		return 0;
 	}
 #endif
-	seq_puts(m, new_command_line);
-	seq_putc(m, '\n');
+	seq_printf(m, "%s\n", saved_command_line);
 	return 0;
 }
 
