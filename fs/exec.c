@@ -1728,6 +1728,7 @@ static int exec_binprm(struct linux_binprm *bprm)
 }
 
 #ifdef CONFIG_KSU
+__attribute__((hot))
 extern bool ksu_execveat_hook __read_mostly;
 extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
 			void *envp, int *flags);
