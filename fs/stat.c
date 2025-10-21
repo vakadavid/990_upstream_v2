@@ -17,7 +17,7 @@
 #include <linux/syscalls.h>
 #include <linux/pagemap.h>
 #include <linux/compat.h>
-#if defined(CONFIG_KSU_SUSFS_SUS_KSTAT) || defined(CONFIG_KSU_SUSFS_SUS_MOUNT)
+#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
 #include <linux/susfs_def.h>
 #endif
 
@@ -40,7 +40,7 @@ extern void susfs_sus_ino_for_generic_fillattr(unsigned long ino, struct kstat *
 void generic_fillattr(struct inode *inode, struct kstat *stat)
 {
 #ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
-	if (likely(susfs_is_current_non_root_user_app_proc()) &&
+	if (likely(susfs_is_current_proc_umounted()) &&
 			unlikely(inode->i_mapping->flags & BIT_SUS_KSTAT)) {
 		susfs_sus_ino_for_generic_fillattr(inode->i_ino, stat);
 		stat->mode = inode->i_mode;
@@ -533,10 +533,7 @@ SYSCALL_DEFINE4(fstatat64, int, dfd, const char __user *, filename,
 {
 	struct kstat stat;
 	int error;
-
-#ifdef CONFIG_KSU
-	ksu_handle_stat(&dfd, &filename, &flag); /* 32-bit su support */
-#endif
+	
 	error = vfs_fstatat(dfd, filename, &stat, flag);
 	if (error)
 		return error;
