@@ -51,7 +51,6 @@ struct rcu_node;
 struct reclaim_state;
 struct robust_list_head;
 struct sched_attr;
-struct sched_param;
 struct seq_file;
 struct sighand_struct;
 struct signal_struct;
@@ -292,6 +291,10 @@ enum uclamp_id {
 	UCLAMP_MIN = 0,
 	UCLAMP_MAX,
 	UCLAMP_CNT
+};
+
+struct sched_param {
+	int sched_priority;
 };
 
 struct sched_info {
@@ -1401,7 +1404,7 @@ struct task_struct {
 
 	ANDROID_KABI_RESERVE(7);
 #ifdef CONFIG_KSU_SUSFS
-       ANDROID_KABI_USE(8, u64 susfs_last_fake_mnt_id);
+    ANDROID_KABI_USE(8, u64 susfs_last_fake_mnt_id);
 #else
 	ANDROID_KABI_RESERVE(8);
 #endif
