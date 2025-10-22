@@ -430,9 +430,13 @@ out_free_cache:
  * mnt_want/drop_write() will _keep_ the filesystem
  * r/w.
  */
-bool __mnt_is_readonly(struct vfsmount *mnt)
+int __mnt_is_readonly(struct vfsmount *mnt)
 {
-	return (mnt->mnt_flags & MNT_READONLY) || sb_rdonly(mnt->mnt_sb);
+	if (mnt->mnt_flags & MNT_READONLY)
+		return 1;
+	if (sb_rdonly(mnt->mnt_sb))
+		return 1;
+	return 0;
 }
 EXPORT_SYMBOL_GPL(__mnt_is_readonly);
 
@@ -445,6 +449,14 @@ static inline void mnt_inc_writers(struct mount *mnt)
 #endif
 }
 
+static inline void mnt_dec_writers(struct mount *mnt)
+{
+#ifdef CONFIG_SMP
+	this_cpu_dec(mnt->mnt_pcp->mnt_writers);
+#else
+	mnt->mnt_writers--;
+#endif
+}
 static inline void mnt_dec_writers(struct mount *mnt)
 {
 #ifdef CONFIG_SMP
