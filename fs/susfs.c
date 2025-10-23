@@ -1319,3 +1319,30 @@ void susfs_init(void) {
 
 /* No module exit is needed becuase it should never be a loadable kernel module */
 //void __init susfs_exit(void)
+
+// --- SuSFS Compatibility Layer for KernelSU integration ---
+// These are safe stubs for compatibility between SuSFS v1.5.10 and v1.5.12+
+
+#ifndef CONFIG_KSU_SUSFS_TRY_UMOUNT
+#define CONFIG_KSU_SUSFS_TRY_UMOUNT 1
+#endif
+
+bool susfs_is_current_proc_umounted(void)
+{
+    return false;
+}
+EXPORT_SYMBOL_GPL(susfs_is_current_proc_umounted);
+
+void susfs_set_current_proc_umounted(void)
+{
+    // no-op
+}
+EXPORT_SYMBOL_GPL(susfs_set_current_proc_umounted);
+
+void susfs_reorder_mnt_id(void)
+{
+    // no-op
+}
+EXPORT_SYMBOL_GPL(susfs_reorder_mnt_id);
+
+// --- End of Compatibility Layer ---
