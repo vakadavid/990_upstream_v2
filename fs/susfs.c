@@ -30,8 +30,8 @@ bool susfs_is_log_enabled __read_mostly = true;
 #define SUSFS_LOGI(fmt, ...) if (susfs_is_log_enabled) pr_info("susfs:[%u][%d][%s] " fmt, current_uid().val, current->pid, __func__, ##__VA_ARGS__)
 #define SUSFS_LOGE(fmt, ...) if (susfs_is_log_enabled) pr_err("susfs:[%u][%d][%s]" fmt, current_uid().val, current->pid, __func__, ##__VA_ARGS__)
 #else
-#define SUSFS_LOGI(fmt, ...)
-#define SUSFS_LOGE(fmt, ...)
+#define SUSFS_LOGI(fmt, ...) 
+#define SUSFS_LOGE(fmt, ...) 
 #endif
 
 bool susfs_starts_with(const char *str, const char *prefix) {
@@ -92,7 +92,7 @@ int susfs_set_i_state_on_external_dir(char __user* user_info, int cmd) {
 		err = -EINVAL;
 		goto out_path_put_path;
 	}
-
+	
 	if (cmd == CMD_SUSFS_SET_ANDROID_DATA_ROOT_PATH) {
 		spin_lock(&inode->i_lock);
 		set_bit(AS_FLAGS_ANDROID_DATA_ROOT_DIR, &inode->i_mapping->flags);
@@ -137,7 +137,7 @@ int susfs_add_sus_path(struct st_susfs_sus_path* __user user_info) {
 		return err;
 	}
 
-	err = kern_path(info.target_pathname, LOOKUP_FOLLOW, &path);
+	err = kern_path(info.target_pathname, 0, &path);
 	if (err) {
 		SUSFS_LOGE("Failed opening file '%s'\n", info.target_pathname);
 		return err;
@@ -458,7 +458,7 @@ static void susfs_update_sus_mount_inode(char *target_pathname) {
 	struct inode *inode = NULL;
 	int err = 0;
 
-	err = kern_path(target_pathname, 0, &p);
+	err = kern_path(target_pathname, LOOKUP_FOLLOW, &p);
 	if (err) {
 		SUSFS_LOGE("Failed opening file '%s'\n", target_pathname);
 		return;
@@ -621,7 +621,7 @@ static int susfs_update_sus_kstat_inode(char *target_pathname) {
 	struct inode *inode = NULL;
 	int err = 0;
 
-	err = kern_path(target_pathname, LOOKUP_FOLLOW, &p);
+	err = kern_path(target_pathname, 0, &p);
 	if (err) {
 		SUSFS_LOGE("Failed opening file '%s'\n", target_pathname);
 		return 1;
@@ -1123,7 +1123,7 @@ int susfs_add_open_redirect(struct st_susfs_open_redirect* __user user_info) {
 	hash_add(OPEN_REDIRECT_HLIST, &new_entry->node, info.target_ino);
 	if (update_hlist) {
 		SUSFS_LOGI("target_ino: '%lu', target_pathname: '%s', redirected_pathname: '%s', is successfully updated to OPEN_REDIRECT_HLIST\n",
-				new_entry->target_ino, new_entry->target_pathname, new_entry->redirected_pathname);
+				new_entry->target_ino, new_entry->target_pathname, new_entry->redirected_pathname);	
 	} else {
 		SUSFS_LOGI("target_ino: '%lu', target_pathname: '%s' redirected_pathname: '%s', is successfully added to OPEN_REDIRECT_HLIST\n",
 				new_entry->target_ino, new_entry->target_pathname, new_entry->redirected_pathname);
@@ -1199,41 +1199,6 @@ out:
 	return 1;
 }
 #endif // #ifdef CONFIG_KSU_SUSFS_SUS_SU
-
-/* sus_map */
-#ifdef CONFIG_KSU_SUSFS_SUS_MAP
-int susfs_add_sus_map(struct st_susfs_sus_map* __user user_info) {
-	struct st_susfs_sus_map info;
-	struct path path;
-	struct inode *inode = NULL;
-	int err = 0;
-
-	err = copy_from_user(&info, user_info, sizeof(info));
-	if (err) {
-		SUSFS_LOGE("failed copying from userspace\n");
-		return err;
-	}
-
-	err = kern_path(info.target_pathname, LOOKUP_FOLLOW, &path);
-	if (err) {
-		SUSFS_LOGE("Failed opening file '%s'\n", info.target_pathname);
-		return err;
-	}
-
-	if (!path.dentry->d_inode) {
-		err = -EINVAL;
-		goto out_path_put_path;
-	}
-	inode = d_inode(path.dentry);
-	spin_lock(&inode->i_lock);
-	set_bit(AS_FLAGS_SUS_MAP, &inode->i_mapping->flags);
-	SUSFS_LOGI("pathname: '%s', is flagged as AS_FLAGS_SUS_MAP\n", info.target_pathname);
-	spin_unlock(&inode->i_lock);
-out_path_put_path:
-	path_put(&path);
-	return err;
-}
-#endif // #ifdef CONFIG_KSU_SUSFS_SUS_MAP
 
 static int copy_config_to_buf(const char *config_string, char *buf_ptr, size_t *copied_size, size_t bufsize) {
 	size_t tmp_size = strlen(config_string);
@@ -1354,30 +1319,3 @@ void susfs_init(void) {
 
 /* No module exit is needed becuase it should never be a loadable kernel module */
 //void __init susfs_exit(void)
-
-// --- SuSFS Compatibility Layer for KernelSU integration ---
-// These are safe stubs for compatibility between SuSFS v1.5.10 and v1.5.12+
-
-#ifndef CONFIG_KSU_SUSFS_TRY_UMOUNT
-#define CONFIG_KSU_SUSFS_TRY_UMOUNT 1
-#endif
-
-bool susfs_is_current_proc_umounted(void)
-{
-    return false;
-}
-EXPORT_SYMBOL_GPL(susfs_is_current_proc_umounted);
-
-void susfs_set_current_proc_umounted(void)
-{
-    // no-op
-}
-EXPORT_SYMBOL_GPL(susfs_set_current_proc_umounted);
-
-void susfs_reorder_mnt_id(void)
-{
-    // no-op
-}
-EXPORT_SYMBOL_GPL(susfs_reorder_mnt_id);
-
-// --- End of Compatibility Layer ---
