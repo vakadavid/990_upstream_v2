@@ -966,7 +966,7 @@ static int show_smap(struct seq_file *m, void *v)
 		SEQ_PUT_DEC(" kB\nKernelPageSize: ", 4);
 		SEQ_PUT_DEC(" kB\nMMUPageSize:    ", 4);
 		seq_puts(m, " kB\n");
-		__show_smap(m, &mss, false);
+		__show_smap(m, &mss);
 		seq_printf(m, "THPeligible:    %d\n", 0);
 		if (arch_pkeys_enabled())
 				seq_printf(m, "ProtectionKey:  %8u\n", vma_pkey(vma));
