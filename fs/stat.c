@@ -17,9 +17,14 @@
 #include <linux/syscalls.h>
 #include <linux/pagemap.h>
 #include <linux/compat.h>
+#if defined(CONFIG_KSU_SUSFS_SUS_KSTAT)
+#include <linux/susfs_def.h>
+#endif
 
 #include <linux/uaccess.h>
 #include <asm/unistd.h>
+
+#include "mount.h"
 
 /**
  * generic_fillattr - Fill in the basic attributes from the inode struct
@@ -30,8 +35,23 @@
  * found on the VFS inode structure.  This is the default if no getattr inode
  * operation is supplied.
  */
+#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
+extern void susfs_sus_ino_for_generic_fillattr(unsigned long ino, struct kstat *stat);
+#endif
+
 void generic_fillattr(struct inode *inode, struct kstat *stat)
 {
+#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
+	if (likely(susfs_is_current_proc_umounted()) &&
+			unlikely(inode->i_mapping->flags & BIT_SUS_KSTAT)) {
+		susfs_sus_ino_for_generic_fillattr(inode->i_ino, stat);
+		stat->mode = inode->i_mode;
+		stat->rdev = inode->i_rdev;
+		stat->uid = inode->i_uid;
+		stat->gid = inode->i_gid;
+		return;
+	}
+#endif
 	stat->dev = inode->i_sb->s_dev;
 	stat->ino = inode->i_ino;
 	stat->mode = inode->i_mode;
@@ -194,6 +214,8 @@ retry:
 		goto out;
 
 	error = vfs_getattr(&path, stat, request_mask, flags);
+	stat->mnt_id = real_mount(path.mnt)->mnt_id;
+	stat->result_mask |= STATX_MNT_ID;
 	path_put(&path);
 	if (retry_estale(error, lookup_flags)) {
 		lookup_flags |= LOOKUP_REVAL;
@@ -554,6 +576,7 @@ cp_statx(const struct kstat *stat, struct statx __user *buffer)
 	tmp.stx_rdev_minor = MINOR(stat->rdev);
 	tmp.stx_dev_major = MAJOR(stat->dev);
 	tmp.stx_dev_minor = MINOR(stat->dev);
+	tmp.stx_mnt_id = stat->mnt_id;
 
 	return copy_to_user(buffer, &tmp, sizeof(tmp)) ? -EFAULT : 0;
 }
