@@ -2094,7 +2094,6 @@ static void ptrace_stop(int exit_code, int why, int clear_code,
 	 * [L]         task_is_traced()		[S] task_clear_jobctl_trapping();
 	 */
 	smp_wmb();
-
 	current->ptrace_message = message;
 	current->last_siginfo = info;
 	current->exit_code = exit_code;
