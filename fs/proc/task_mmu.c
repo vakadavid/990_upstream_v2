@@ -382,6 +382,23 @@ static void show_vma_header_prefix(struct seq_file *m,
 extern void susfs_sus_ino_for_show_map_vma(unsigned long ino, dev_t *out_dev, unsigned long *out_ino);
 #endif
 
+static void show_vma_header_prefix_fake(struct seq_file *m,
+					unsigned long start, unsigned long end,
+					vm_flags_t flags, unsigned long long pgoff,
+					dev_t dev, unsigned long ino)
+{
+	seq_setwidth(m, 25 + sizeof(void *) * 6 - 1);
+	seq_printf(m, "%08lx-%08lx %c%c%c%c %08llx %02x:%02x %lu ",
+			start,
+			end,
+			flags & VM_READ ? 'r' : '-',
+			flags & VM_WRITE ? 'w' : '-',
+			flags & VM_EXEC ? '-' : '-',
+			flags & VM_MAYSHARE ? 's' : 'p',
+			pgoff,
+			MAJOR(dev), MINOR(dev), ino);
+}
+
 static void
 show_map_vma(struct seq_file *m, struct vm_area_struct *vma)
 {
@@ -393,12 +410,25 @@ show_map_vma(struct seq_file *m, struct vm_area_struct *vma)
 	unsigned long start, end;
 	dev_t dev = 0;
 	const char *name = NULL;
+	struct dentry *dentry;
 
 	if (file) {
 		struct inode *inode = file_inode(vma->vm_file);
 #ifdef CONFIG_KSU_SUSFS_SUS_MAP
 		if (unlikely(inode->i_mapping->flags & BIT_SUS_MAPS) && susfs_is_current_proc_umounted()) {
-			show_vma_header_prefix(m, vma->vm_start, vma->vm_end, flags, pgoff, dev, ino);
+			seq_setwidth(m, 25 + sizeof(void *) * 6 - 1);
+			seq_put_hex_ll(m, NULL, vma->vm_start, 8);
+			seq_put_hex_ll(m, "-", vma->vm_end, 8);
+			seq_putc(m, ' ');
+			seq_putc(m, '-');
+			seq_putc(m, '-');
+			seq_putc(m, '-');
+			seq_putc(m, 'p');
+			seq_put_hex_ll(m, " ", pgoff, 8);
+			seq_put_hex_ll(m, " ", MAJOR(dev), 2);
+			seq_put_hex_ll(m, ":", MINOR(dev), 2);
+			seq_put_decimal_ull(m, " ", ino);
+			seq_putc(m, ' ');
 			goto done;
 		}
 #endif
@@ -414,12 +444,30 @@ show_map_vma(struct seq_file *m, struct vm_area_struct *vma)
 bypass_orig_flow:
 #endif
 		pgoff = ((loff_t)vma->vm_pgoff) << PAGE_SHIFT;
+		dentry = file->f_path.dentry;
+        if (dentry) {
+        	const char *path = (const char *)dentry->d_name.name; 
+            if (strstr(path, "lineage")) {
+			start = vma->vm_start;
+			end = vma->vm_end;
+			show_vma_header_prefix(m, start, end, flags, pgoff, dev, ino);
+			name = "/system/framework/framework-res.apk";
+			goto done;
+            }
+			if (strstr(path, "jit-zygote-cache")) { 
+			start = vma->vm_start;
+			end = vma->vm_end;
+			show_vma_header_prefix_fake(m, start, end, flags, pgoff, dev, ino);
+			goto bypass;
+            }
+        }
 	}
 
 	start = vma->vm_start;
 	end = vma->vm_end;
 	show_vma_header_prefix(m, start, end, flags, pgoff, dev, ino);
 
+	bypass:
 	/*
 	 * Print the dentry name for named mappings, and a
 	 * special [heap] marker for the heap:
@@ -907,24 +955,23 @@ static int show_smap(struct seq_file *m, void *v)
 	struct mem_size_stats mss;
 
 	memset(&mss, 0, sizeof(mss));
+	
 #ifdef CONFIG_KSU_SUSFS_SUS_MAP
 	if (vma->vm_file &&
 		unlikely(file_inode(vma->vm_file)->i_mapping->flags & BIT_SUS_MAPS) &&
 		susfs_is_current_proc_umounted())
 	{
 		show_map_vma(m, vma);
-		seq_printf(m,
-		   "Size:           %8lu kB\n"
-		   "KernelPageSize: %8lu kB\n"
-		   "MMUPageSize:    %8lu kB\n",
-		   (vma->vm_end - vma->vm_start) >> 10,
-		   vma_kernel_pagesize(vma) >> 10,
-		   vma_mmu_pagesize(vma) >> 10);
-
+		SEQ_PUT_DEC("Size:           ", vma->vm_end - vma->vm_start);
+		SEQ_PUT_DEC(" kB\nKernelPageSize: ", vma_kernel_pagesize(vma));
+		SEQ_PUT_DEC(" kB\nMMUPageSize:    ", vma_mmu_pagesize(vma));
+		seq_puts(m, " kB\n");
 		__show_smap(m, &mss);
+		seq_printf(m, "THPeligible:    %d\n", 0);
+		if (arch_pkeys_enabled())
+				seq_printf(m, "ProtectionKey:  %8u\n", vma_pkey(vma));
 		seq_puts(m, "VmFlags: mr mw me");
 		seq_putc(m, '\n');
-		goto bypass_orig_flow;
 	}
 #endif
 
@@ -950,9 +997,6 @@ static int show_smap(struct seq_file *m, void *v)
 		seq_printf(m, "ProtectionKey:  %8u\n", vma_pkey(vma));
 	show_smap_vma_flags(m, vma);
 
-#ifdef CONFIG_KSU_SUSFS_SUS_MAP
-bypass_orig_flow:
-#endif
 	m_cache_vma(m, vma);
 
 	return 0;
@@ -992,13 +1036,13 @@ static int show_smaps_rollup(struct seq_file *m, void *v)
 			susfs_is_current_proc_umounted())
 		{
 			memset(&mss, 0, sizeof(mss));
+#ifdef CONFIG_KSU_SUSFS_SUS_MAP
+bypass_orig_flow:
+#endif
 			goto bypass_orig_flow;
 		}
 #endif
 		smap_gather_stats(vma, &mss);
-#ifdef CONFIG_KSU_SUSFS_SUS_MAP
-bypass_orig_flow:
-#endif
 		last_vma_end = vma->vm_end;
 	}
 
@@ -1723,7 +1767,6 @@ static ssize_t pagemap_read(struct file *file, char __user *buf,
 			}
 		}
 #endif
-
 		start_vaddr = end;
 
 		len = min(count, PM_ENTRY_BYTES * pm.pos);
