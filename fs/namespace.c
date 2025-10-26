@@ -40,8 +40,6 @@ extern bool susfs_is_current_zygote_domain(void);
 extern bool susfs_is_boot_completed_triggered;
 
 static DEFINE_IDA(susfs_ksu_mnt_group_ida);
-static int susfs_mnt_id_start = DEFAULT_KSU_MNT_ID;
-static int susfs_mnt_group_start = DEFAULT_KSU_MNT_GROUP_ID;
 
 #define CL_COPY_MNT_NS BIT(25) /* used by copy_mnt_ns() */
 #define CL_ZYGOTE_COPY_MNT_NS BIT(24) /* used by copy_mnt_ns() */
