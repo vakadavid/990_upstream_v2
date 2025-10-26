@@ -910,9 +910,6 @@ static ssize_t mem_rw(struct file *file, char __user *buf,
 				} else {
 					copied = -EIO;
 				}
-				*ppos = addr;
-				mmput(mm);
-				goto free;
 			}
 		}
 #endif

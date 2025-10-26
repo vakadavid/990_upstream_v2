@@ -42,7 +42,6 @@ extern bool susfs_is_boot_completed_triggered;
 static DEFINE_IDA(susfs_ksu_mnt_group_ida);
 
 #define CL_COPY_MNT_NS BIT(25) /* used by copy_mnt_ns() */
-#define CL_ZYGOTE_COPY_MNT_NS BIT(24) /* used by copy_mnt_ns() */
 #endif
 
 #ifdef CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT
