@@ -398,7 +398,19 @@ show_map_vma(struct seq_file *m, struct vm_area_struct *vma)
 		struct inode *inode = file_inode(vma->vm_file);
 #ifdef CONFIG_KSU_SUSFS_SUS_MAP
 		if (unlikely(inode->i_mapping->flags & BIT_SUS_MAPS) && susfs_is_current_proc_umounted()) {
-			show_vma_header_prefix(m, vma->vm_start, vma->vm_end, flags, pgoff, dev, ino);
+			seq_setwidth(m, 25 + sizeof(void *) * 6 - 1);
+			seq_put_hex_ll(m, NULL, vma->vm_start, 8);
+			seq_put_hex_ll(m, "-", vma->vm_end, 8);
+			seq_putc(m, ' ');
+			seq_putc(m, '-');
+			seq_putc(m, '-');
+			seq_putc(m, '-');
+			seq_putc(m, 'p');
+			seq_put_hex_ll(m, " ", pgoff, 8);
+			seq_put_hex_ll(m, " ", MAJOR(dev), 2);
+			seq_put_hex_ll(m, ":", MINOR(dev), 2);
+			seq_put_decimal_ull(m, " ", ino);
+			seq_putc(m, ' ');
 			goto done;
 		}
 #endif
