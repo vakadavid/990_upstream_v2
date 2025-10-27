@@ -1,14 +1,21 @@
 name: Build kernel
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - susfstest
+
+  workflow_dispatch:
+    inputs:
+      force_build:
+        description: 'Force build (manual trigger)'
+        type: boolean
+        default: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+    if: github.ref == 'refs/heads/susfstest'  # only runs if on the 'susfstest' branch
     steps:
       - name: Checkout repo
         uses: actions/checkout@v5
