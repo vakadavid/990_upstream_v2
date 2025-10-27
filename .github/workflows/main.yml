@@ -6,12 +6,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/susfstest'  # only runs if on the 'susfstest' branch
     steps:
       - name: Checkout repo
         uses: actions/checkout@v5
         with:
-          submodules: 'recursive'
+          submodules: 'true'
+
+      - name: Fetch and checkout KSU at version 12880
+        run: |
+          cd 990_upstream_v2/KernelSU-Next
+          git fetch
+          git checkout 1c253a33d28ee567ac4b9b4eb7c53568ae43d461
+          cd ../..
 
       - name: Set up environment
         run: |
