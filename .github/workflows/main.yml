@@ -1,17 +1,8 @@
 name: Build kernel
 
 on:
-  push:
-    branches:
-      - susfstest
-
   workflow_dispatch:
-    inputs:
-      force_build:
-        description: 'Force build (manual trigger)'
-        type: boolean
-        default: false
-
+  
 jobs:
   build:
     runs-on: ubuntu-latest
