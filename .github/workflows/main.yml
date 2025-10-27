@@ -24,6 +24,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libarchive-tools ccache
 
+      - name: Delete old symlink and link it again
+        run: |
+          rm -rf drivers/kernelsu
+          ln -s KernelSU-Next/kernel drivers/kernelsu
+
+      - name: Run setup.sh
+        run: |
+          curl -LSs "https://raw.githubusercontent.com/vakadavid/KernelSU-Next/next-susfs/kernel/setup.sh"
+          bash -s next-susfs
+          
       - name: Build Kernel
         run: |
           chmod +x ./build.sh
