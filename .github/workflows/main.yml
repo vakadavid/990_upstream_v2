@@ -24,10 +24,8 @@ jobs:
       - name: Run setup.sh
         run: |
           curl -LSs "https://raw.githubusercontent.com/vakadavid/KernelSU-Next/next-susfs/kernel/setup.sh" | bash -s next-susfs
-          KSU_VERSION=12880
-          echo "KSU_VERSION"
 
-      - name: Fetch and checkout KSU at version 12880
+      - name: Fetch and checkout KSU at latest commit
         run: |
           cd $GITHUB_WORKSPACE/KernelSU-Next
           git fetch
