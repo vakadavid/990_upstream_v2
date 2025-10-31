@@ -65,5 +65,11 @@ jobs:
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
+          files: |
+           $GITHUB_WORKSPACE/build/out/z3s/*.zip
            name: ExtremeKRNL with SUSFS ${{ env.BUILD_DATE }}
-           path: ${{ env.ZIP_FILES }}
+           tag_name: ${{ github.run_id }}
+           body: |
+            ## ExtremeKRNL Build - Unofficial
+           Device: z3s
+           Commit: Most recent [commit](${{ env.DEVICE_TREE_URL }}/commit/${{ env.COMMIT_ID }}) during building.
