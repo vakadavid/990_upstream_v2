@@ -15,7 +15,7 @@ jobs:
       - name: Set up environment
         run: |
           sudo apt-get update
-          sudo apt-get install -y libarchive-tools ccache
+          sudo apt-get install -y libarchive-tools ccache libssl-dev
 
       - name: Delete old KernelSU
         run: |
@@ -29,11 +29,11 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/KernelSU-Next
           git fetch
-          git checkout 1c253a33d28ee567ac4b9b4eb7c53568ae43d461
+          git checkout df96e06be3356e68968ef527e808110380db1cba
           echo
           cd ../..
 
-      - name: resymlink
+      - name: Symlink KSU kernel to drivers
         run: |
           ln -s $GITHUB_WORKSPACE/KernelSU-next/kernel/ $GITHUB_WORKSPACE/drivers/kernelsu
           chmod +x ./drivers/kernelsu
