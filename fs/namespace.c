@@ -26,11 +26,11 @@
 #include <linux/bootmem.h>
 #include <linux/task_work.h>
 #include <linux/sched/task.h>
-#include <linux/fslog.h>
 #if defined(CONFIG_KSU_SUSFS_SUS_MOUNT) || defined(CONFIG_KSU_SUSFS_TRY_UMOUNT)
 #include <linux/susfs_def.h>
 #endif
 
+#include <linux/fslog.h>
 #include "pnode.h"
 #include "internal.h"
 
@@ -204,7 +204,6 @@ static void mnt_free_id(struct mount *mnt)
 		ida_free(&mnt_id_ida, mnt->mnt.susfs_mnt_id_backup);
 		return;
 	}
-
 #endif
 	ida_free(&mnt_id_ida, mnt->mnt_id);
 }
@@ -220,7 +219,7 @@ static int mnt_alloc_group_id(struct mount *mnt)
 	/* - At frist susfs_is_boot_completed_triggered is set to false in kernel,
 	 *   and it is still allowed to assign our custom mnt_group_id via susfs_ksu_mnt_group_ida
 	 *   if it is ksu mounts, until susfs_is_boot_completed_triggered is set to true
-	 *   when boot-completed stage is triggered in core_hook.c 
+	 *   when boot-completed stage is triggered in core_hook.c
 	 */
 	if (!susfs_is_boot_completed_triggered && mnt->mnt_id >= DEFAULT_KSU_MNT_ID) {
 		res = ida_alloc_min(&susfs_ksu_mnt_group_ida, DEFAULT_KSU_MNT_GROUP_ID, GFP_KERNEL);
@@ -314,22 +313,23 @@ static struct mount *susfs_reuse_sus_vfsmnt(const char *name, int orig_mnt_id)
 
 		if (name) {
 			mnt->mnt_devname = kstrdup_const(name,
-							 GFP_KERNEL);
+											 GFP_KERNEL_ACCOUNT);
 			if (!mnt->mnt_devname)
-			goto out_free_cache;
-        }
+				goto out_free_cache;
+		}
 
-#ifdef CONFIG_SMP
+		#ifdef CONFIG_SMP
 		mnt->mnt_pcp = alloc_percpu(struct mnt_pcp);
 		if (!mnt->mnt_pcp)
 			goto out_free_devname;
 
 		this_cpu_add(mnt->mnt_pcp->mnt_count, 1);
-#else
+		#else
 		mnt->mnt_count = 1;
 		mnt->mnt_writers = 0;
-#endif
+		#endif
 		mnt->mnt.data = NULL;
+
 		// Makes ida_free() easier to determine whether it should free the mnt_id or not
 		mnt->mnt.susfs_mnt_id_backup = DEFAULT_KSU_MNT_ID;
 
@@ -347,11 +347,11 @@ static struct mount *susfs_reuse_sus_vfsmnt(const char *name, int orig_mnt_id)
 	}
 	return mnt;
 
-#ifdef CONFIG_SMP
-out_free_devname:
+	#ifdef CONFIG_SMP
+	out_free_devname:
 	kfree_const(mnt->mnt_devname);
-#endif
-out_free_cache:
+	#endif
+	out_free_cache:
 	kmem_cache_free(mnt_cache, mnt);
 	return NULL;
 }
@@ -364,27 +364,27 @@ static struct mount *susfs_alloc_sus_vfsmnt(const char *name)
 	struct mount *mnt = kmem_cache_zalloc(mnt_cache, GFP_KERNEL);
 	if (mnt) {
 		mnt->mnt_id = DEFAULT_KSU_MNT_ID;
+
 		if (name) {
 			mnt->mnt_devname = kstrdup_const(name,
-							 GFP_KERNEL);
+											 GFP_KERNEL_ACCOUNT);
 			if (!mnt->mnt_devname)
 				goto out_free_cache;
 		}
 
-#ifdef CONFIG_SMP
+		#ifdef CONFIG_SMP
 		mnt->mnt_pcp = alloc_percpu(struct mnt_pcp);
 		if (!mnt->mnt_pcp)
 			goto out_free_devname;
 
 		this_cpu_add(mnt->mnt_pcp->mnt_count, 1);
-#else
+		#else
 		mnt->mnt_count = 1;
 		mnt->mnt_writers = 0;
-#endif
+		#endif
 		mnt->mnt.data = NULL;
 		// Makes ida_free() easier to determine whether it should free the mnt_id or not
 		mnt->mnt.susfs_mnt_id_backup = DEFAULT_KSU_MNT_ID;
-
 
 		INIT_HLIST_NODE(&mnt->mnt_hash);
 		INIT_LIST_HEAD(&mnt->mnt_child);
@@ -400,11 +400,11 @@ static struct mount *susfs_alloc_sus_vfsmnt(const char *name)
 	}
 	return mnt;
 
-#ifdef CONFIG_SMP
-out_free_devname:
+	#ifdef CONFIG_SMP
+	out_free_devname:
 	kfree_const(mnt->mnt_devname);
-#endif
-out_free_cache:
+	#endif
+	out_free_cache:
 	kmem_cache_free(mnt_cache, mnt);
 	return NULL;
 }
@@ -436,11 +436,11 @@ static struct mount *alloc_vfsmnt(const char *name)
 		mnt->mnt_count = 1;
 		mnt->mnt_writers = 0;
 #endif
-		mnt->mnt.data = NULL;
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 		// Make sure mnt->mnt.susfs_mnt_id_backup is initialized every time.
 		mnt->mnt.susfs_mnt_id_backup = 0;
 #endif
+		mnt->mnt.data = NULL;
 
 		INIT_HLIST_NODE(&mnt->mnt_hash);
 		INIT_LIST_HEAD(&mnt->mnt_child);
@@ -1190,7 +1190,7 @@ vfs_kern_mount(struct file_system_type *type, int flags, const char *name, void 
 {
 	struct mount *mnt;
 	struct dentry *root;
-
+	
 	if (!type)
 		return ERR_PTR(-ENODEV);
 
@@ -1201,10 +1201,13 @@ vfs_kern_mount(struct file_system_type *type, int flags, const char *name, void 
 		goto bypass_orig_flow;
 	}
 #endif
+
 	mnt = alloc_vfsmnt(name);
+
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 bypass_orig_flow:
 #endif
+
 	if (!mnt)
 		return ERR_PTR(-ENOMEM);
 
@@ -1260,13 +1263,10 @@ static struct mount *clone_mnt(struct mount *old, struct dentry *root,
 	int err;
 
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
-
-	// - We do not check anymore for ksu process if boot-completed stage is triggered
-	//   just to stop the performance loss
+	// We won't check it anymore if boot-completed stage is triggered.
 	if (susfs_is_boot_completed_triggered) {
 		goto skip_checking_for_ksu_proc;
 	}
-
 	// First we must check for ksu process because of magic mount
 	if (susfs_is_current_ksu_domain()) {
 		// if it is unsharing, we reuse the old->mnt_id
@@ -1278,14 +1278,12 @@ static struct mount *clone_mnt(struct mount *old, struct dentry *root,
 		mnt = susfs_alloc_sus_vfsmnt(old->mnt_devname);
 		goto bypass_orig_flow;
 	}
-
 skip_checking_for_ksu_proc:
 	// Lastly for other processes of which old->mnt_id == DEFAULT_KSU_MNT_ID, go assign fake mnt_id
 	if (old->mnt_id == DEFAULT_KSU_MNT_ID) {
 		mnt = susfs_alloc_sus_vfsmnt(old->mnt_devname);
 		goto bypass_orig_flow;
 	}
-
 #endif
 	mnt = alloc_vfsmnt(old->mnt_devname);
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
@@ -1667,7 +1665,7 @@ static void namespace_unlock(void)
 	if (likely(hlist_empty(&head)))
 		return;
 
-	synchronize_rcu_expedited();
+	synchronize_rcu();
 
 	group_pin_kill(&head);
 }
@@ -1925,7 +1923,6 @@ static bool may_mandlock(void)
 	return capable(CAP_SYS_ADMIN);
 }
 #else
-	
 static inline bool may_mandlock(void)
 {
 	pr_warn("VFS: \"mand\" mount option not supported");
@@ -1955,7 +1952,6 @@ int ksys_umount(char __user *name, int flags)
 	if (flags & ~(MNT_FORCE | MNT_DETACH | MNT_EXPIRE | UMOUNT_NOFOLLOW))
 		return -EINVAL;
 
-	if (flags & ~(MNT_FORCE | MNT_DETACH | MNT_EXPIRE | UMOUNT_NOFOLLOW))
 	if (!may_mount())
 		return -EPERM;
 
@@ -2068,7 +2064,7 @@ struct mount *copy_tree(struct mount *mnt, struct dentry *dentry,
 					int flag)
 {
 	struct mount *res, *p, *q, *r, *parent;
-
+	
 	if (!(flag & CL_COPY_UNBINDABLE) && IS_MNT_UNBINDABLE(mnt))
 		return ERR_PTR(-EINVAL);
 
@@ -2114,6 +2110,7 @@ struct mount *copy_tree(struct mount *mnt, struct dentry *dentry,
 			q = clone_mnt(p, p->mnt.mnt_root, flag);
 			if (IS_ERR(q))
 				goto out;
+
 			lock_mount_hash();
 			list_add_tail(&q->mnt_list, &res->mnt_list);
 			attach_mnt(q, parent, p->mnt_mp);
@@ -2579,7 +2576,8 @@ static int do_loopback(struct path *path, const char *old_name,
 		unlock_mount_hash();
 	}
 #if defined(CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT) || defined(CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT)
-	// - Check if bind mounted path should be hidden and umounted automatically.
+	// Check if bind mounted path should be hidden and umounted automatically.
+	// And we target only process with ksu domain.
 	if (susfs_is_current_ksu_domain()) {
 #if defined(CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT)
 		if (susfs_is_auto_add_sus_bind_mount_enabled) {
@@ -2700,81 +2698,72 @@ static inline int tree_contains_unbindable(struct mount *mnt)
 	return 0;
 }
 
-static int do_move_mount(struct path *old_path, struct path *new_path)
+static int do_move_mount(struct path *path, const char *old_name)
 {
-	struct path parent_path = {.mnt = NULL, .dentry = NULL};
+	struct path old_path, parent_path;
 	struct mount *p;
 	struct mount *old;
 	struct mountpoint *mp;
 	int err;
+	if (!old_name || !*old_name)
+		return -EINVAL;
+	err = kern_path(old_name, LOOKUP_FOLLOW, &old_path);
+	if (err)
+		return err;
 
-	mp = lock_mount(new_path);
+	mp = lock_mount(path);
+	err = PTR_ERR(mp);
 	if (IS_ERR(mp))
-		return PTR_ERR(mp);
+		goto out;
 
-	old = real_mount(old_path->mnt);
-	p = real_mount(new_path->mnt);
+	old = real_mount(old_path.mnt);
+	p = real_mount(path->mnt);
 
 	err = -EINVAL;
 	if (!check_mnt(p) || !check_mnt(old))
-		goto out;
-
-	if (!mnt_has_parent(old))
-		goto out;
+		goto out1;
 
 	if (old->mnt.mnt_flags & MNT_LOCKED)
-		goto out;
+		goto out1;
 
-	if (old_path->dentry != old_path->mnt->mnt_root)
-		goto out;
+	err = -EINVAL;
+	if (old_path.dentry != old_path.mnt->mnt_root)
+		goto out1;
 
-	if (d_is_dir(new_path->dentry) !=
-	    d_is_dir(old_path->dentry))
-		goto out;
+	if (!mnt_has_parent(old))
+		goto out1;
+
+	if (d_is_dir(path->dentry) !=
+	      d_is_dir(old_path.dentry))
+		goto out1;
 	/*
 	 * Don't move a mount residing in a shared parent.
 	 */
 	if (IS_MNT_SHARED(old->mnt_parent))
-		goto out;
+		goto out1;
 	/*
 	 * Don't move a mount tree containing unbindable mounts to a destination
 	 * mount which is shared.
 	 */
 	if (IS_MNT_SHARED(p) && tree_contains_unbindable(old))
-		goto out;
+		goto out1;
 	err = -ELOOP;
 	for (; mnt_has_parent(p); p = p->mnt_parent)
 		if (p == old)
-			goto out;
+			goto out1;
 
-	err = attach_recursive_mnt(old, real_mount(new_path->mnt), mp,
-				   &parent_path);
+	err = attach_recursive_mnt(old, real_mount(path->mnt), mp, &parent_path);
 	if (err)
-		goto out;
+		goto out1;
 
 	/* if the mount is moved, it should no longer be expire
 	 * automatically */
 	list_del_init(&old->mnt_expire);
-out:
+out1:
 	unlock_mount(mp);
+out:
 	if (!err)
 		path_put(&parent_path);
-	return err;
-}
-
-static int do_move_mount_old(struct path *path, const char *old_name)
-{
-	struct path old_path;
-	int err;
-
-	if (!old_name || !*old_name)
-		return -EINVAL;
-
-	err = kern_path(old_name, LOOKUP_FOLLOW, &old_path);
-	if (err)
-		return err;
-
-	err = do_move_mount(&old_path, path);
 	path_put(&old_path);
 	return err;
 }
@@ -3198,11 +3187,19 @@ long do_mount(const char *dev_name, const char __user *dir_name,
 	else if (flags & (MS_SHARED | MS_PRIVATE | MS_SLAVE | MS_UNBINDABLE))
 		retval = do_change_type(&path, flags);
 	else if (flags & MS_MOVE)
-		retval = do_move_mount_old(&path, dev_name);
+		retval = do_move_mount(&path, dev_name);
 	else
 		retval = do_new_mount(&path, type_page, sb_flags, mnt_flags,
 				      dev_name, data_page);
-
+#ifdef CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT
+	// For both Legacy and Magic Mount KernelSU
+	if (!susfs_is_boot_completed_triggered && !retval && susfs_is_auto_add_sus_ksu_default_mount_enabled &&
+			(!(flags & (MS_REMOUNT | MS_BIND | MS_SHARED | MS_PRIVATE | MS_SLAVE | MS_UNBINDABLE)))) {
+		if (susfs_is_current_ksu_domain()) {
+			susfs_auto_add_sus_ksu_default_mount(dir_name);
+		}
+	}
+#endif
 dput_out:
 	path_put(&path);
 	return retval;
@@ -3299,7 +3296,6 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
 	copy_flags = CL_COPY_UNBINDABLE | CL_EXPIRE;
 	if (user_ns != ns->user_ns)
 		copy_flags |= CL_SHARED_TO_SLAVE | CL_UNPRIVILEGED;
-
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 	copy_flags |= CL_COPY_MNT_NS;
 #endif
@@ -3319,6 +3315,7 @@ struct mnt_namespace *copy_mnt_ns(unsigned long flags, struct mnt_namespace *ns,
 	 */
 	p = old;
 	q = new;
+
 	while (p) {
 		q->mnt_ns = new_ns;
 		new_ns->mounts++;
@@ -3423,14 +3420,6 @@ int ksys_mount(char __user *dev_name, char __user *dir_name, char __user *type,
 		goto out_data;
 
 	ret = do_mount(kernel_dev, dir_name, kernel_type, flags, options);
-#ifdef CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT
-	// - We do not check anymore if boot-completed stage is triggered
-	//   just to stop the performance loss
-	// - Just for the compatibility of Magic Mount KernelSU
-	if (!susfs_is_boot_completed_triggered && !ret && susfs_is_auto_add_sus_ksu_default_mount_enabled && susfs_is_current_ksu_domain()) {
-		susfs_auto_add_sus_ksu_default_mount(dir_name);
-	}
-#endif
 
 	kfree(options);
 out_data:
@@ -3445,70 +3434,6 @@ SYSCALL_DEFINE5(mount, char __user *, dev_name, char __user *, dir_name,
 		char __user *, type, unsigned long, flags, void __user *, data)
 {
 	return ksys_mount(dev_name, dir_name, type, flags, data);
-}
-
-/*
- * Move a mount from one place to another.
- *
- * Note the flags value is a combination of MOVE_MOUNT_* flags.
- */
-SYSCALL_DEFINE5(move_mount,
-		int, from_dfd, const char *, from_pathname,
-		int, to_dfd, const char *, to_pathname,
-		unsigned int, flags)
-{
-	struct path from_path, to_path;
-	unsigned int lflags;
-	int ret = 0;
-
-	if (!may_mount())
-		return -EPERM;
-
-	if (flags & ~MOVE_MOUNT__MASK)
-		return -EINVAL;
-
-	/* If someone gives a pathname, they aren't permitted to move
-	 * from an fd that requires unmount as we can't get at the flag
-	 * to clear it afterwards.
-	 */
-	lflags = 0;
-	if (flags & MOVE_MOUNT_F_SYMLINKS)	lflags |= LOOKUP_FOLLOW;
-	if (flags & MOVE_MOUNT_F_AUTOMOUNTS)	lflags |= LOOKUP_AUTOMOUNT;
-	if (flags & MOVE_MOUNT_F_EMPTY_PATH)	lflags |= LOOKUP_EMPTY;
-
-	ret = user_path_at(from_dfd, from_pathname, lflags, &from_path);
-	if (ret < 0)
-		return ret;
-
-	lflags = 0;
-	if (flags & MOVE_MOUNT_T_SYMLINKS)	lflags |= LOOKUP_FOLLOW;
-	if (flags & MOVE_MOUNT_T_AUTOMOUNTS)	lflags |= LOOKUP_AUTOMOUNT;
-	if (flags & MOVE_MOUNT_T_EMPTY_PATH)	lflags |= LOOKUP_EMPTY;
-
-	ret = user_path_at(to_dfd, to_pathname, lflags, &to_path);
-	if (ret < 0)
-		goto out_from;
-
-	ret = security_move_mount(&from_path, &to_path);
-	if (ret < 0)
-		goto out_to;
-
-	ret = do_move_mount(&from_path, &to_path);
-
-out_to:
-	path_put(&to_path);
-out_from:
-	path_put(&from_path);
-#ifdef CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT
-	// - We do not check anymore if boot-completed stage is triggered
-	//   just to stop the performance loss
-	// - For Legacy KSU mount scheme
-	if (!susfs_is_boot_completed_triggered && !ret && susfs_is_auto_add_sus_ksu_default_mount_enabled && susfs_is_current_ksu_domain()) {
-		susfs_auto_add_sus_ksu_default_mount(to_pathname);
-	}
-#endif
-
-	return ret;
 }
 
 /*
