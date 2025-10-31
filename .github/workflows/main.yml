@@ -59,5 +59,11 @@ jobs:
       - name: Upload built kernels
         uses: actions/upload-artifact@v4
         with:
-          name: built-kernels
+          name: ExtremeKRNL
           path: ${{ env.ZIP_FILES }}
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+           name: ExtremeKRNL with SUSFS ${{ env.BUILD_DATE }}
+           path: ${{ env.ZIP_FILES }}
