@@ -11,13 +11,16 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: xtrance63/990_upstream_v2
-          path: main
           submodules: 'true'
 
       - name: Set up environment
         run: |
           sudo apt-get update
           sudo apt-get install -y libarchive-tools ccache libssl-dev
+
+      - name: Delete old symlink
+        run: |
+          rm -rf $GITHUB_WORKSPACE/drivers/kernelsu
           
       - name: Delete old KernelSU
         run: |
@@ -43,8 +46,8 @@ jobs:
       - name: Build Kernel
         run: |
           make clean
-          chmod +x https://github.com/vakadavid/990_upstream_v2/blob/susfstest/build.sh
-          https://github.com/vakadavid/990_upstream_v2/blob/susfstest/build.sh -m z3s -k y -r n
+          chmod +x ./build.sh
+          ./build.sh -m z3s -k y -r n
           
       - name: Find built zips
         id: find_zips
