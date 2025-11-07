@@ -144,3 +144,5 @@ static struct platform_driver exynos_cpuidle_driver = {
 	},
 };
 builtin_platform_driver(exynos_cpuidle_driver);
+
+exynos_register_cpuidle_driver(...);
