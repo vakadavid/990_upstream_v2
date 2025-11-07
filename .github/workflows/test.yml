@@ -60,12 +60,9 @@ jobs:
           echo "ZIP_FILES<<EOF" >> $GITHUB_ENV
           echo "$ZIP_FILES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+          
       - name: Upload built kernels
         uses: actions/upload-artifact@v4
         with:
-          name: ExtremeKRNL
-          path: ${{ env.ZIP_FILES }}
-          body: |
-            ## ExtremeKRNL Build - Unofficial
-            Device: z3s
-            Commit: Most recent [commit](${{ env.DEVICE_TREE_URL }}/commit/${{ env.COMMIT_ID }}) during building.
+          name: ${ZIP_NAME}
+          path: build/out/${MODEL}/Extreme*.zip
