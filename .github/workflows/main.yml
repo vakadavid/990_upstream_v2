@@ -59,7 +59,7 @@ jobs:
       - name: Upload built kernels
         uses: actions/upload-artifact@v4
         with:
-          name: ${ZIP_NAME}
+          name: ExtremeKRNL
           path: ${{ env.ZIP_FILES }}
 
       - name: Upload to Release
@@ -67,7 +67,7 @@ jobs:
         with:
           files: |
             ./build/out/z3s/Extreme*.zip
-          name: ExtremeKRNL with SUSFS ${{ env.BUILD_DATE }}
+          name: ExtremeKRNL with SUSFS${{ env.BUILD_DATE }}
           tag_name: ${{ github.run_id }}
           body: |
             ## ExtremeKRNL Build - Unofficial
