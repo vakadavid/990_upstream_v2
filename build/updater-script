@@ -1,9 +1,26 @@
-ui_print(" ");
-ui_print("Installing ExtremeKernel UNOFFICIAL...");
-ui_print(" ");
+ui_print("");
+ui_print("+----------------------------+");
+ui_print("|   Installing ExtremeKernel |");
+ui_print("|      with SUSFS 1.5.12     |");
+ui_print("|           V0.0.9           |");
+ui_print("+----------------------------+");
+ui_print("");
+ui_print("+----------------------------+");
+ui_print("|    Based On ExtremeKRNL    |");
+ui_print("+----------------------------+");
+ui_print("");
+ui_print("+----------------------------+");
+ui_print("| ExtremeXT/990_upstream_v2  |");
+ui_print("+----------------------------+");
+ui_print("");
 
 package_extract_file("files/boot.img", "/dev/block/by-name/boot");
 package_extract_file("files/dtbo.img", "/dev/block/by-name/dtbo");
 
-ui_print("Installation done!");
-ui_print(" ");
+ui_print("");
+ui_print("+----------------------------+");
+ui_print("|   Installation Success     |");
+ui_print("+----------------------------+");
+ui_print("");
+ui_print("You may now reboot your device.");
+ui_print("");
