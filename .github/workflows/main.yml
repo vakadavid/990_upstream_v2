@@ -60,13 +60,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${ZIP_NAME}
-          path: ./build/out/${MODEL}/Extreme*.zip
+          path: ${{ env.ZIP_FILES }}
 
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            ./build/out/${MODEL}/Extreme*.zip
+            ./build/out/z3s/Extreme*.zip
           name: ExtremeKRNL with SUSFS ${{ env.BUILD_DATE }}
           tag_name: ${{ github.run_id }}
           body: |
