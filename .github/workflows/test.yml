@@ -10,7 +10,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v5
         with:
-          repository: xtrance63/990_upstream_v2
           submodules: 'true'
 
       - name: Set up environment
@@ -28,19 +27,19 @@ jobs:
           
       - name: Run setup.sh
         run: |
-          curl -LSs "https://raw.githubusercontent.com/vakadavid/KernelSU-Next/next-susfs/kernel/setup.sh" | bash -s next-susfs
+          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/susfs-test/kernel/setup.sh" | bash -s susfs-test
 
       - name: Fetch and checkout KSU at latest commit 
         run: |
-          cd $GITHUB_WORKSPACE/KernelSU-Next
+          cd $GITHUB_WORKSPACE/KernelSU
           git fetch
-          git checkout b0b6cd07e318f6b352cb075cd2b75cfdd9c91a60
+          git checkout 86cd05e206b6b97f5a7954560b327563e835cbee
           echo
           cd ../..
           
       - name: Symlink KSU kernel to drivers
         run: |
-          ln -s $GITHUB_WORKSPACE/KernelSU-next/kernel/ $GITHUB_WORKSPACE/drivers/kernelsu
+          ln -s $GITHUB_WORKSPACE/KernelSU/kernel/ $GITHUB_WORKSPACE/drivers/kernelsu
           chmod +x ./drivers/kernelsu
          
       - name: Build Kernel
