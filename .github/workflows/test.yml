@@ -27,13 +27,13 @@ jobs:
           
       - name: Run setup.sh
         run: |
-          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/susfs-main/kernel/setup.sh" | bash -s susfs-main
+          curl -LSs "https://raw.githubusercontent.com/hakuna77/SukiSU-Ultra/susfs-main/kernel/setup.sh" | bash -s susfs-main
 
       - name: Fetch and checkout KSU at latest commit 
         run: |
           cd $GITHUB_WORKSPACE/KernelSU
           git fetch
-          git checkout 678c00cad91b8c9e8a2d8d3ffe71d919812d2d10
+          git checkout 029eb4dff71cf316fd5d5edd03c17fcd6f08eec9
           echo
           cd ../..
           
