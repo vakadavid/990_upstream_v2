@@ -1335,4 +1335,3 @@ void susfs_init(void) {
 
 /* No module exit is needed becuase it should never be a loadable kernel module */
 //void __init susfs_exit(void)
-EXPORT_SYMBOL_GPL(TWA_RESUME);
