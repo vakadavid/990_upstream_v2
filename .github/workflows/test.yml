@@ -33,7 +33,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/KernelSU
           git fetch
-          git checkout 68fd2a633e957a603045ecd67af49ab4bdc08c55
+          git checkout 02904d8a32699cfe2a8a298e3b4279c3de708f14
           echo
           cd ../..
           
@@ -63,5 +63,5 @@ jobs:
       - name: Upload built kernels
         uses: actions/upload-artifact@v4
         with:
-          name: ${ZIP_NAME}
-          path: build/out/${MODEL}/Extreme*.zip
+          name: ExtremeKRNL
+          path: ${{ env.ZIP_FILES }}
