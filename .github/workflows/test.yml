@@ -46,7 +46,7 @@ jobs:
         run: |
           make clean
           chmod +x ./build.sh
-          ./build.sh -m z3s -k y -r n
+          ./build_kpm.sh -m z3s -k y -r n
           
       - name: Find built zips
         id: find_zips
