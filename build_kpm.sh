@@ -267,6 +267,3 @@ fi
 
 popd > /dev/null
 echo "Build finished successfully!"
-
-echo "making unpatched Image"
-./build-unpatched-zip.sh
