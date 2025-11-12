@@ -33,7 +33,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/KernelSU
           git fetch
-          git checkout 7f0e05b7c042f2515078c35ea4e6f55187cd592f
+          git checkout 6a322d70f73503bc8ab012d274612f62ceec1ced
           echo
           cd ../..
           
@@ -45,8 +45,8 @@ jobs:
       - name: Build Kernel
         run: |
           make clean
-          chmod +x ./build_kpm.sh
-          ./build_kpm.sh -m z3s -k y -r n
+          chmod +x ./build_new.sh
+          ./build_new.sh -m z3s -k y -r n
           
       - name: Find built zips
         id: find_zips
