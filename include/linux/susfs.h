@@ -32,7 +32,6 @@ struct st_susfs_sus_path {
 	unsigned int                     i_uid;
 };
 
-
 struct st_susfs_sus_path_list {
 	struct list_head                 list;
 	struct st_susfs_sus_path         info;
@@ -49,7 +48,6 @@ struct st_sdcard_path {
 	char                             pathname[SUSFS_MAX_LEN_PATHNAME];
 	bool                             is_inited;
 };
-
 #endif
 
 /* sus_mount */
@@ -129,10 +127,10 @@ struct st_susfs_open_redirect_hlist {
 };
 #endif
 
-/* sus_su */
-#ifdef CONFIG_KSU_SUSFS_SUS_SU
-struct st_sus_su {
-	int         mode;
+/* sus_map */
+#ifdef CONFIG_KSU_SUSFS_SUS_MAP
+struct st_susfs_sus_map {
+	char                             target_pathname[SUSFS_MAX_LEN_PATHNAME];
 };
 #endif
 
@@ -182,21 +180,12 @@ struct filename* susfs_get_redirected_path(unsigned long ino);
 #endif
 /* sus_map */
 #ifdef CONFIG_KSU_SUSFS_SUS_MAP
-struct st_susfs_sus_map {
-	char                             target_pathname[SUSFS_MAX_LEN_PATHNAME];
-};
-#endif
-/* sus_su */
-#ifdef CONFIG_KSU_SUSFS_SUS_SU
-int susfs_get_sus_su_working_mode(void);
-int susfs_sus_su(struct st_sus_su* __user user_info);
-#endif
-/* sus_map */
-#ifdef CONFIG_KSU_SUSFS_SUS_MAP
 int susfs_add_sus_map(struct st_susfs_sus_map* __user user_info);
 #endif
+
 int susfs_get_enabled_features(char __user* buf, size_t bufsize);
 void susfs_set_avc_log_spoofing(bool enabled);
+
 /* susfs_init */
 void susfs_init(void);
 
