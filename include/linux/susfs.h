@@ -32,6 +32,7 @@ struct st_susfs_sus_path {
 	unsigned int                     i_uid;
 };
 
+
 struct st_susfs_sus_path_list {
 	struct list_head                 list;
 	struct st_susfs_sus_path         info;
@@ -48,6 +49,7 @@ struct st_sdcard_path {
 	char                             pathname[SUSFS_MAX_LEN_PATHNAME];
 	bool                             is_inited;
 };
+
 #endif
 
 /* sus_mount */
@@ -134,42 +136,35 @@ struct st_sus_su {
 };
 #endif
 
-/* sus_map */
-#ifdef CONFIG_KSU_SUSFS_SUS_MAP
-struct st_susfs_sus_map {
-	char                             target_pathname[SUSFS_MAX_LEN_PATHNAME];
-};
-#endif
-
 /***********************/
 /* FORWARD DECLARATION */
 /***********************/
 /* sus_path */
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
-int susfs_set_i_state_on_external_dir(arg);
-int susfs_add_sus_path(arg);
+int susfs_set_i_state_on_external_dir(char __user* user_info, int cmd);
+int susfs_add_sus_path(struct st_susfs_sus_path* __user user_info);
 #endif
 /* sus_mount */
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
-int susfs_add_sus_mount(arg);
+int susfs_add_sus_mount(struct st_susfs_sus_mount* __user user_info);
 #endif // #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 
 /* sus_kstat */
 #ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
-int susfs_add_sus_kstat(arg);
-int susfs_update_sus_kstat(arg);
-void susfs_sus_ino_for_generic_fillattr(arg);
-void susfs_sus_ino_for_show_map_vma(arg);
+int susfs_add_sus_kstat(struct st_susfs_sus_kstat* __user user_info);
+int susfs_update_sus_kstat(struct st_susfs_sus_kstat* __user user_info);
+void susfs_sus_ino_for_generic_fillattr(unsigned long ino, struct kstat *stat);
+void susfs_sus_ino_for_show_map_vma(unsigned long ino, dev_t *out_dev, unsigned long *out_ino);
 #endif
 /* try_umount */
 #ifdef CONFIG_KSU_SUSFS_TRY_UMOUNT
-int susfs_add_try_umount(arg);
-void susfs_try_umount(arg);
+int susfs_add_try_umount(struct st_susfs_try_umount* __user user_info);
+void susfs_try_umount(uid_t target_uid);
 #endif // #ifdef CONFIG_KSU_SUSFS_TRY_UMOUNT
 /* spoof_uname */
 #ifdef CONFIG_KSU_SUSFS_SPOOF_UNAME
-int susfs_set_uname(arg);
-void susfs_spoof_uname(arg);
+int susfs_set_uname(struct st_susfs_uname* __user user_info);
+void susfs_spoof_uname(struct new_utsname* tmp);
 #endif
 /* set_log */
 #ifdef CONFIG_KSU_SUSFS_ENABLE_LOG
@@ -177,27 +172,31 @@ void susfs_set_log(bool enabled);
 #endif
 /* spoof_cmdline_or_bootconfig */
 #ifdef CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG
-int susfs_set_cmdline_or_bootconfig(arg);
+int susfs_set_cmdline_or_bootconfig(char* __user user_fake_boot_config);
 int susfs_spoof_cmdline_or_bootconfig(struct seq_file *m);
 #endif
 /* open_redirect */
 #ifdef CONFIG_KSU_SUSFS_OPEN_REDIRECT
-int susfs_add_open_redirect(arg);
+int susfs_add_open_redirect(struct st_susfs_open_redirect* __user user_info);
 struct filename* susfs_get_redirected_path(unsigned long ino);
+#endif
+/* sus_map */
+#ifdef CONFIG_KSU_SUSFS_SUS_MAP
+struct st_susfs_sus_map {
+	char                             target_pathname[SUSFS_MAX_LEN_PATHNAME];
+};
 #endif
 /* sus_su */
 #ifdef CONFIG_KSU_SUSFS_SUS_SU
 int susfs_get_sus_su_working_mode(void);
-int susfs_sus_su(arg);
+int susfs_sus_su(struct st_sus_su* __user user_info);
 #endif
 /* sus_map */
 #ifdef CONFIG_KSU_SUSFS_SUS_MAP
-int susfs_add_sus_map(arg);
+int susfs_add_sus_map(struct st_susfs_sus_map* __user user_info);
 #endif
-
-int susfs_get_enabled_features(arg);
+int susfs_get_enabled_features(char __user* buf, size_t bufsize);
 void susfs_set_avc_log_spoofing(bool enabled);
-
 /* susfs_init */
 void susfs_init(void);
 
