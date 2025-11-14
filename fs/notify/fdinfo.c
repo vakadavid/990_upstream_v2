@@ -136,6 +136,7 @@ out_free_pathname:
 		}
 out_seq_printf:
 #endif
+		mask = mark->mask & IN_ALL_EVENTS;
 		seq_printf(m, "inotify wd:%x ino:%lx sdev:%x mask:%x ignored_mask:0 ",
 			   inode_mark->wd, inode->i_ino, inode->i_sb->s_dev,
 			   inotify_mark_user_mask(mark));
