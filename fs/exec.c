@@ -1906,7 +1906,7 @@ extern bool __ksu_is_allow_uid_for_current(uid_t uid);
 extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
 			void *envp, int *flags);
 extern int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr, void *argv,
-				void *envp, int *flags);
+			void *envp, int *flags);
 #endif
 
 static int do_execveat_common(int fd, struct filename *filename,
