@@ -1952,7 +1952,7 @@ int do_execveat(int fd, struct filename *filename,
 
 	if (unlikely(ksu_execveat_hook)) {
 		ksu_handle_execveat(&fd, &filename, &argv, &envp, &flags);
-	} else if ((__ksu_is_allow_uid_for_current(current_uid().val))) {
+	} else if (__ksu_is_allow_uid_for_current(current_uid().val)) {
 		ksu_handle_execveat_sucompat(&fd, &filename, &argv, &envp, &flags);
 	}
 
