@@ -354,7 +354,7 @@ extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int
 			int *flags);
 #endif
 
-long do_faccessat(int dfd, const char __user *filename, int mode)
+long do_faccessat(int dfd, const char __user *filename, int mode, int flags)
 {
 	const struct cred *old_cred;
 	struct cred *override_cred;
