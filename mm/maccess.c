@@ -141,7 +141,7 @@ long __probe_user_write(void __user *dst, const void *src, size_t size)
 EXPORT_SYMBOL_GPL(probe_user_write);
 
 /**
- * strncpy_from_unsafe: - Copy a NUL terminated string from unsafe address.
+ * strncpy_from_user_nofault: - Copy a NUL terminated string from unsafe address.
  * @dst:   Destination address, in kernel space.  This buffer must be at
  *         least @count bytes long.
  * @unsafe_addr: Unsafe address.
@@ -157,7 +157,7 @@ EXPORT_SYMBOL_GPL(probe_user_write);
  * If @count is smaller than the length of the string, copies @count-1 bytes,
  * sets the last byte of @dst buffer to NUL and returns @count.
  */
-long strncpy_from_unsafe(char *dst, const void *unsafe_addr, long count)
+long strncpy_from_user_nofault(char *dst, const void *unsafe_addr, long count)
 {
 	mm_segment_t old_fs = get_fs();
 	const void *src = unsafe_addr;
