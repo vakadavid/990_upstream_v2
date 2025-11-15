@@ -33,7 +33,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/KernelSU
           git fetch
-          git checkout e484fe37d1b578fbe6639b5eafe9e45b79336f4b
+          git checkout 74b1b1df680c416ea17e46a80ac2d28f9d3c7c27
           echo
           cd ../..
           
