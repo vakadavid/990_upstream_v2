@@ -223,7 +223,7 @@ BPF_CALL_5(bpf_trace_printk, char *, fmt, u32, fmt_size, u64, arg1,
 					break;
 				}
 				buf[0] = 0;
-				strncpy_from_unsafe(buf,
+				strncpy_from_user_nofault(buf,
 						    (void *) (long) unsafe_addr,
 						    sizeof(buf));
 			}
@@ -533,7 +533,7 @@ BPF_CALL_3(bpf_probe_read_str, void *, dst, u32, size,
 	 * code altogether don't copy garbage; otherwise length of string
 	 * is returned that can be used for bpf_perf_event_output() et al.
 	 */
-	ret = strncpy_from_unsafe(dst, unsafe_ptr, size);
+	ret = strncpy_from_user_nofault(dst, unsafe_ptr, size);
 	if (unlikely(ret < 0))
 		memset(dst, 0, size);
 
