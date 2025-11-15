@@ -1710,6 +1710,7 @@ static int lookup_fast(struct nameidata *nd,
 	int status = 1;
 	int err;
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
+	unsigned backup_next_seq;
 	bool is_nd_state_lookup_last_and_open_last = (nd->state & ND_STATE_LOOKUP_LAST || nd->state & ND_STATE_OPEN_LAST);
 #endif
 
@@ -1722,7 +1723,6 @@ static int lookup_fast(struct nameidata *nd,
 		unsigned seq;
 		bool negative;
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
-		unsigned backup_next_seq;
 
 		if (is_nd_state_lookup_last_and_open_last && parent->d_inode) {
 			if (susfs_is_base_dentry_android_data_dir(parent) &&
@@ -1810,7 +1810,7 @@ skip_orig_flow1:
 #endif
 		dentry = __d_lookup(parent, &nd->last);
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
-		if (is_nd_state_lookup_last_and_open_last && dentry && !IS_ERR(dentry) && dentry->d_inode && parent->d_inode) {
+		if (is_nd_state_lookup_last_and_open_last && dentry && !IS_ERR(dentry) && dentry->d_inode) {
 			if (susfs_is_inode_sus_path(dentry->d_inode)) {
 				dput(dentry);
 				dentry = __d_lookup(parent, &susfs_fake_qstr_name);
