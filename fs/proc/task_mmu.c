@@ -364,8 +364,8 @@ static void show_vma_header_prefix(struct seq_file *m,
 				   dev_t dev, unsigned long ino)
 {
 	seq_setwidth(m, 25 + sizeof(void *) * 6 - 1);
-	seq_put_hex_ll(m, NULL, start, 8);
-	seq_put_hex_ll(m, "-", end, 8);
+	seq_put_hex_ll(m, NULL, vma->vm_start, 8);
+	seq_put_hex_ll(m, "-", vma->vm_end, 8);
 	seq_putc(m, ' ');
 	seq_putc(m, flags & VM_READ ? 'r' : '-');
 	seq_putc(m, flags & VM_WRITE ? 'w' : '-');
