@@ -17,9 +17,7 @@
 #include <linux/syscore_ops.h>
 #include <linux/uaccess.h>
 #include <linux/sec_debug.h>
-#ifdef CONFIG_KSU_SUSFS
-#include <linux/susfs.h>
-#endif // #ifdef CONFIG_KSU_SUSFS
+
 /*
  * this indicates whether you can reboot with ctrl-alt-del: the default is yes
  */
