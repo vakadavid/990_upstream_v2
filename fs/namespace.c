@@ -1195,7 +1195,7 @@ vfs_kern_mount(struct file_system_type *type, int flags, const char *name, void 
 		return ERR_PTR(-ENODEV);
 
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
-    // We only check for ksu process
+   // We keep checking for ksu process only until boot-completed stage is triggered
 	if (!susfs_is_boot_completed_triggered && susfs_is_current_ksu_domain()) {
 		mnt = susfs_alloc_sus_vfsmnt(name);
 		goto bypass_orig_flow;
@@ -2579,6 +2579,7 @@ static int do_loopback(struct path *path, const char *old_name,
 	}
 #if defined(CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT) || defined(CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT)
 	// - Check if bind mounted path should be hidden and umounted automatically.
+	// - We keep checking for ksu process only until boot-completed stage is triggered.
 	if (!susfs_is_boot_completed_triggered && susfs_is_current_ksu_domain()) {
 #if defined(CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT)
 		if (susfs_is_auto_add_sus_bind_mount_enabled) {
