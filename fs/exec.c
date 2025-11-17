@@ -1900,7 +1900,7 @@ out_ret:
 	return retval;
 }
 
-#if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
+#ifdef CONFIG_KSU_SUSFS
 extern bool ksu_execveat_hook __read_mostly;
 extern bool __ksu_is_allow_uid_for_current(uid_t uid);
 extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
@@ -1914,7 +1914,7 @@ static int do_execveat_common(int fd, struct filename *filename,
 			      struct user_arg_ptr envp,
 			      int flags)
 {
-#if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
+#ifdef CONFIG_KSU_SUSFS
 	if (likely(susfs_is_current_proc_umounted())) {
 		goto orig_flow;
 	}

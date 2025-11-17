@@ -169,7 +169,7 @@ int vfs_statx_fd(unsigned int fd, struct kstat *stat,
 }
 EXPORT_SYMBOL(vfs_statx_fd);
 
-#if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
+#ifdef CONFIG_KSU_SUSFS
 extern bool __ksu_is_allow_uid_for_current(uid_t uid);
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 1, 0)
 extern int ksu_handle_stat(int *dfd, struct filename **filename, int *flags);
@@ -200,7 +200,7 @@ int vfs_statx(int dfd, const char __user *filename, int flags,
 	int error = -EINVAL;
 	unsigned int lookup_flags = LOOKUP_FOLLOW | LOOKUP_AUTOMOUNT;
 
-#if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
+#ifdef CONFIG_KSU_SUSFS
 	if (likely(susfs_is_current_proc_umounted())) {
 		goto orig_flow;
 	}
