@@ -26,7 +26,6 @@
 extern bool susfs_hide_sus_mnts_for_all_procs;
 #endif
 
-
 static __poll_t mounts_poll(struct file *file, poll_table *wait)
 {
 	struct seq_file *m = file->private_data;
