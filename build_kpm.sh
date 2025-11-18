@@ -267,3 +267,6 @@ fi
 
 popd > /dev/null
 echo "Build finished successfully!"
+
+echo "making unpatched Image"
+./build_unpatched.sh
