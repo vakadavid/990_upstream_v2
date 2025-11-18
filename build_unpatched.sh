@@ -1,7 +1,7 @@
 ## Build auxiliary boot.img files
 
 MODEL=unpatched_z3s
-BOARD=SRPSG12A018KU
+BOARD=SRPSI19B018KU
 RECOVERY_OPTION=n
 KSU_OPTION=y
 DTBS=n
