@@ -45,8 +45,9 @@ jobs:
       - name: Build Kernel
         run: |
           make clean
-          chmod +x ./build.sh
-          ./build.sh -m z3s -k y -r n
+          chmod +x ./build_kpm.sh
+          chmod +x ./build_unpatched.sh
+          ./build_kpm.sh -m z3s -k y -r n
           
       - name: Find built zips
         id: find_zips
