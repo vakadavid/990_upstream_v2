@@ -982,7 +982,7 @@ static int show_smap(struct seq_file *m, void *v)
 
 	memset(&mss, 0, sizeof(mss));
 
-##ifdef CONFIG_KSU_SUSFS_SUS_MAP
+#ifdef CONFIG_KSU_SUSFS_SUS_MAP
     if (vma->vm_file &&
         unlikely(file_inode(vma->vm_file)->i_mapping->flags & BIT_SUS_MAPS) &&
         susfs_is_current_proc_umounted())
