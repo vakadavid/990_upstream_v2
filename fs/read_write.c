@@ -21,9 +21,7 @@
 #include <linux/mount.h>
 #include <linux/fs.h>
 #include "internal.h"
-#if defined(CONFIG_KSU) && defined(CONFIG_KSU_TRACEPOINT_HOOK)
-#include <../drivers/kernelsu/ksu_trace.h>
-#endif
+
 #include <linux/uaccess.h>
 #include <asm/unistd.h>
 
@@ -604,9 +602,6 @@ extern __attribute__((cold)) int ksu_handle_sys_read(unsigned int fd,
 
 SYSCALL_DEFINE3(read, unsigned int, fd, char __user *, buf, size_t, count)
 {
-#if defined(CONFIG_KSU) && defined(CONFIG_KSU_TRACEPOINT_HOOK)
-		trace_ksu_trace_sys_read_hook(fd, &buf, &count);
-#endif
 #ifdef CONFIG_KSU_SUSFS
 	if (unlikely(ksu_vfs_read_hook)) 
 		ksu_handle_sys_read(fd, &buf, &count);
