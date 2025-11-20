@@ -1,0 +1,75 @@
+name: Build kernel
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+        with:
+          submodules: 'true'
+
+      - name: Set up environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libarchive-tools ccache libssl-dev
+
+      - name: Delete old KernelSU
+        run: |
+          rm -rf $GITHUB_WORKSPACE/KernelSU-Next
+          
+      - name: Run setup.sh
+        run: |
+          curl -LSs "https://raw.githubusercontent.com/vakadavid/KernelSU-Next/next-susfs/kernel/setup.sh" | bash -s next-susfs
+
+      - name: Fetch and checkout KSU at latest commit 
+        run: |
+          cd $GITHUB_WORKSPACE/KernelSU-Next
+          git fetch
+          git checkout 71bd3ce62de187a366ded0530f6def1f4af5d1a9
+          echo
+          cd ../..
+
+      - name: Symlink KSU kernel to drivers
+        run: |
+          ln -s $GITHUB_WORKSPACE/KernelSU-next/kernel/ $GITHUB_WORKSPACE/drivers/kernelsu
+          chmod +x ./drivers/kernelsu
+         
+      - name: Build Kernel
+        run: |
+          make clean
+          chmod +x ./build_new.sh
+          ./build_new.sh -m z3s -k y -r n
+
+      - name: Find built zips
+        id: find_zips
+        run: |
+          ZIP_FILES=$(find . -type f -name "*.zip")
+          if [[ -z "$ZIP_FILES" ]]; then
+            echo "No ZIPs found! Exiting."
+            exit 1
+          fi
+          echo "ZIP_FILES<<EOF" >> $GITHUB_ENV
+          echo "$ZIP_FILES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Upload built kernels
+        uses: actions/upload-artifact@v4
+        with:
+          name: ExtremeKRNL
+          path: ${{ env.ZIP_FILES }}
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ./build/out/z3s/Extreme*.zip
+          name: ExtremeKRNL with SUSFS${{ env.BUILD_DATE }}
+          tag_name: ${{ github.run_id }}
+          body: |
+            ## ExtremeKRNL Build - Unofficial
+            Device: z3s
+            Commit: Most recent [commit](${{ env.DEVICE_TREE_URL }}/commit/${{ env.COMMIT_ID }}) during building.
