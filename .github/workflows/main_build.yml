@@ -20,6 +20,10 @@ jobs:
       - name: Delete old KernelSU
         run: |
           rm -rf $GITHUB_WORKSPACE/KernelSU-Next
+      
+      - name: Delete old symlink
+        run: |
+          rm -rf $GITHUB_WORKSPACE/drivers/kernelsu
           
       - name: Run setup.sh
         run: |
