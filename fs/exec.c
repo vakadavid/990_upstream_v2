@@ -1900,11 +1900,33 @@ out_ret:
 	return retval;
 }
 
+#if defined(CONFIG_KSU) && defined(CONFIG_KSU_MANUAL_HOOK)
+extern bool ksu_execveat_hook __read_mostly;
+extern bool __ksu_is_allow_uid_for_current(uid_t uid);
+extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
+			void *envp, int *flags);
+extern int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr, void *argv,
+				void *envp, int *flags);
+#endif
+
 static int do_execveat_common(int fd, struct filename *filename,
 			      struct user_arg_ptr argv,
 			      struct user_arg_ptr envp,
 			      int flags)
 {
+#ifdef CONFIG_KSU_SUSFS
+	if (likely(susfs_is_current_proc_umounted())) {
+		goto orig_flow;
+	}
+
+	if (unlikely(ksu_execveat_hook)) {
+		ksu_handle_execveat(&fd, &filename, &argv, &envp, &flags);
+	} else if ((__ksu_is_allow_uid_for_current(current_uid().val))) {
+		ksu_handle_execveat_sucompat(&fd, &filename, &argv, &envp, &flags);
+	}
+
+orig_flow:
+#endif
 	return __do_execve_file(fd, filename, argv, envp, flags, NULL);
 }
 
@@ -1998,20 +2020,11 @@ void set_dumpable(struct mm_struct *mm, int value)
 	} while (cmpxchg(&mm->flags, old, new) != old);
 }
 
-#if defined(CONFIG_KSU) && defined(CONFIG_KSU_MANUAL_HOOK)
-__attribute__((hot))
-extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr,
-				void *argv, void *envp, int *flags);
-#endif
-
 SYSCALL_DEFINE3(execve,
 		const char __user *, filename,
 		const char __user *const __user *, argv,
 		const char __user *const __user *, envp)
 {
-#if defined(CONFIG_KSU) && defined(CONFIG_KSU_MANUAL_HOOK)
-	ksu_handle_execve_sucompat((int *)AT_FDCWD, &filename, NULL, NULL, NULL);
-#endif
 	return do_execve(getname(filename), argv, envp);
 }
 
@@ -2033,9 +2046,6 @@ COMPAT_SYSCALL_DEFINE3(execve, const char __user *, filename,
 	const compat_uptr_t __user *, argv,
 	const compat_uptr_t __user *, envp)
 {
-#if defined(CONFIG_KSU) && defined(CONFIG_KSU_MANUAL_HOOK) // 32-bit ksud and 32-on-64 support
-	ksu_handle_execve_sucompat((int *)AT_FDCWD, &filename, NULL, NULL, NULL);
-#endif
 	return compat_do_execve(getname(filename), argv, envp);
 }
 
