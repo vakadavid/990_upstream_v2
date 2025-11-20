@@ -362,7 +362,7 @@ long do_faccessat(int dfd, const char __user *filename, int mode)
 	int res;
 	unsigned int lookup_flags = LOOKUP_FOLLOW;
 
-#ifdef CONFIG_KSU
+#ifdef CONFIG_KSU_SUSFS
 	if (likely(susfs_is_current_proc_umounted())) {
 		goto orig_flow;
 	}
