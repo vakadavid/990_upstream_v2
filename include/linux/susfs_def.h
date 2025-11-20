@@ -25,6 +25,9 @@
 #define CMD_SUSFS_SHOW_VERSION 0x555e1
 #define CMD_SUSFS_SHOW_ENABLED_FEATURES 0x555e2
 #define CMD_SUSFS_SHOW_VARIANT 0x555e3
+#define CMD_SUSFS_SHOW_SUS_SU_WORKING_MODE 0x555e4
+#define CMD_SUSFS_IS_SUS_SU_READY 0x555f0
+#define CMD_SUSFS_SUS_SU 0x60000
 #define CMD_SUSFS_ENABLE_AVC_LOG_SPOOFING 0x60010
 #define CMD_SUSFS_ADD_SUS_MAP 0x60020
 
@@ -33,6 +36,10 @@
 
 #define TRY_UMOUNT_DEFAULT 0 /* used by susfs_try_umount() */
 #define TRY_UMOUNT_DETACH 1 /* used by susfs_try_umount() */
+
+#define SUS_SU_DISABLED 0
+#define SUS_SU_WITH_OVERLAY 1 /* deprecated */
+#define SUS_SU_WITH_HOOKS 2
 
 #define DEFAULT_KSU_MNT_ID 500000 /* used by mount->mnt_id */
 #define DEFAULT_KSU_MNT_GROUP_ID 5000 /* used by mount->mnt_group_id */
