@@ -1730,7 +1730,7 @@ static int exec_binprm(struct linux_binprm *bprm)
 	return ret;
 }
 
-#ifdef CONFIG_KSU_SUSFS
+#if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
 extern bool ksu_execveat_hook __read_mostly;
 extern bool __ksu_is_allow_uid_for_current(uid_t uid);
 extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
@@ -1755,7 +1755,7 @@ static int __do_execve_file(int fd, struct filename *filename,
 	if (IS_ERR(filename))
 		return PTR_ERR(filename);
 
-#ifdef CONFIG_KSU_SUSFS
+#if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
 	if (likely(susfs_is_current_proc_umounted())) {
 		goto orig_flow;
 	}
