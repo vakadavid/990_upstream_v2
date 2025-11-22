@@ -6,6 +6,7 @@
 #include <linux/hugetlb.h>
 #include <linux/mm.h>
 #include <asm/cacheflush.h>
+#include <linux/set_memory.h>
 #include <asm/facility.h>
 #include <asm/pgtable.h>
 #include <asm/pgalloc.h>

@@ -20,6 +20,7 @@
 #include <linux/if_vlan.h>
 
 #include <asm/cacheflush.h>
+#include <linux/set_memory.h>
 #include <asm/hwcap.h>
 #include <asm/opcodes.h>
 #include <asm/system_info.h>
