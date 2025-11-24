@@ -304,11 +304,7 @@ EXPORT_SYMBOL_GPL(kernel_power_off);
 
 DEFINE_MUTEX(system_transition_mutex);
 
-#ifdef CONFIG_KSU_MANUAL_HOOK
-extern int ksu_handle_sys_reboot(int magic1, int magic2, unsigned int cmd, void __user **arg);
-#endif
-
-#if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
+#if defined(CONFIG_KSU_SUSFS) && defined(CONFIG_KSU_MANUAL_HOOK)
 extern int ksu_handle_sys_reboot(int magic1, int magic2, unsigned int cmd, void __user **arg);
 #endif
 /*
@@ -326,11 +322,7 @@ SYSCALL_DEFINE4(reboot, int, magic1, int, magic2, unsigned int, cmd,
 	char buffer[256];
 	int ret = 0;
 
-#ifdef CONFIG_KSU_MANUAL_HOOK 
-	ksu_handle_sys_reboot(magic1, magic2, cmd, &arg);
-#endif
-
-#if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
+#if defined(CONFIG_KSU_SUSFS) && defined(CONFIG_KSU_MANUAL_HOOK)
 	ret = ksu_handle_sys_reboot(magic1, magic2, cmd, &arg);
 	if (ret) {
 		goto orig_flow;
