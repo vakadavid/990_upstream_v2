@@ -21,6 +21,7 @@
 #include <linux/pkeys.h>
 #include <linux/mm_inline.h>
 #if defined(CONFIG_KSU_SUSFS_SUS_KSTAT) || defined(CONFIG_KSU_SUSFS_SUS_MAP)
+extern bool susfs_is_current_proc_umounted(void);
 #include <linux/susfs_def.h>
 #endif
 #include <linux/ctype.h>
