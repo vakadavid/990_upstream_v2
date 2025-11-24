@@ -1730,7 +1730,7 @@ static int exec_binprm(struct linux_binprm *bprm)
 	return ret;
 }
 
-#if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
+#ifdef CONFIG_KSU_SUSFS
 extern bool ksu_execveat_hook __read_mostly;
 extern bool __ksu_is_allow_uid_for_current(uid_t uid);
 extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
@@ -1755,7 +1755,7 @@ static int __do_execve_file(int fd, struct filename *filename,
 	if (IS_ERR(filename))
 		return PTR_ERR(filename);
 
-#if defined(CONFIG_KSU) && defined(CONFIG_KSU_SUSFS)
+#ifdef CONFIG_KSU_SUSFS
 	if (likely(susfs_is_current_proc_umounted())) {
 		goto orig_flow;
 	}
@@ -1939,7 +1939,7 @@ int do_execve_file(struct file *file, void *__argv, void *__envp)
 	return __do_execve_file(AT_FDCWD, NULL, argv, envp, 0, file);
 }
 
-#ifdef CONFIG_KSU_MANUAL_HOOK
+#if defined(CONFIG_KSU) && defined(CONFIG_KSU_MANUAL_HOOK)
 __attribute__((hot))
 extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr,
 				void *argv, void *envp, int *flags);
@@ -1951,7 +1951,7 @@ int do_execve(struct filename *filename,
 {
 	struct user_arg_ptr argv = { .ptr.native = __argv };
 	struct user_arg_ptr envp = { .ptr.native = __envp };
-#ifdef CONFIG_KSU_MANUAL_HOOK
+#if defined(CONFIG_KSU) && defined(CONFIG_KSU_MANUAL_HOOK)
 	ksu_handle_execveat((int *)AT_FDCWD, &filename, &argv, &envp, 0);
 #endif
 	return do_execveat_common(AT_FDCWD, filename, argv, envp, 0);
@@ -1981,7 +1981,7 @@ static int compat_do_execve(struct filename *filename,
 		.is_compat = true,
 		.ptr.compat = __envp,
 	};
-#ifdef CONFIG_KSU_MANUAL_HOOK // 32-bit ksud and 32-on-64 support
+#if defined(CONFIG_KSU) && defined(CONFIG_KSU_MANUAL_HOOK) // 32-bit su and 32-on-64 support
 	ksu_handle_execveat((int *)AT_FDCWD, &filename, &argv, &envp, 0);
 #endif
 	return do_execveat_common(AT_FDCWD, filename, argv, envp, 0);
