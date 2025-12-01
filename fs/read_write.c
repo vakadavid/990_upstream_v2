@@ -438,19 +438,10 @@ ssize_t kernel_read(struct file *file, void *buf, size_t count, loff_t *pos)
 }
 EXPORT_SYMBOL(kernel_read);
 
-#ifdef CONFIG_KSU
-extern bool ksu_vfs_read_hook __read_mostly;
-extern int ksu_handle_sys_read(unsigned int fd,
-               char __user **buf_ptr, size_t *count_ptr);
-#endif
 ssize_t vfs_read(struct file *file, char __user *buf, size_t count, loff_t *pos)
 {
 	ssize_t ret;
 
-#ifdef CONFIG_KSU 
-	if (unlikely(ksu_vfs_read_hook))
-		ksu_handle_sys_read(fd, &buf, &count);
-#endif
 	if (!(file->f_mode & FMODE_READ))
 		return -EBADF;
 	if (!(file->f_mode & FMODE_CAN_READ))
@@ -603,6 +594,12 @@ ssize_t ksys_read(unsigned int fd, char __user *buf, size_t count)
 	return ret;
 }
 
+#ifdef CONFIG_KSU
+extern bool ksu_vfs_read_hook __read_mostly;
+extern int ksu_handle_sys_read(unsigned int fd,
+               char __user **buf_ptr, size_t *count_ptr);
+#endif
+
 #ifdef CONFIG_KSU_SUSFS
 extern bool ksu_vfs_read_hook __read_mostly;
 extern __attribute__((cold)) int ksu_handle_sys_read(unsigned int fd,
@@ -611,6 +608,12 @@ extern __attribute__((cold)) int ksu_handle_sys_read(unsigned int fd,
 
 SYSCALL_DEFINE3(read, unsigned int, fd, char __user *, buf, size_t, count)
 {
+
+#ifdef CONFIG_KSU 
+	if (unlikely(ksu_vfs_read_hook))
+		ksu_handle_sys_read(fd, &buf, &count);
+#endif
+
 #ifdef CONFIG_KSU_SUSFS
 	if (unlikely(ksu_vfs_read_hook))
 		ksu_handle_sys_read(fd, &buf, &count);
