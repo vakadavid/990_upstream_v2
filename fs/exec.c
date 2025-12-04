@@ -1900,7 +1900,7 @@ out_ret:
 	return retval;
 }
 
-#ifdef CONFIG_KSU_MANUAL_HOOK
+#ifdef CONFIG_KSU
 __attribute__((hot))
 extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr,
 				void *argv, void *envp, int *flags);
@@ -1920,7 +1920,7 @@ static int do_execveat_common(int fd, struct filename *filename,
 			      struct user_arg_ptr envp,
 			      int flags)
 {
-#ifdef CONFIG_KSU_MANUAL_HOOK
+#ifdef CONFIG_KSU
 	ksu_handle_execveat((int *)AT_FDCWD, &filename, &argv, &envp, 0);
 #endif
 
@@ -1998,7 +1998,7 @@ static int compat_do_execveat(int fd, struct filename *filename,
 		.is_compat = true,
 		.ptr.compat = __envp,
 	};
-#ifdef CONFIG_KSU_MANUAL_HOOK // 32-bit ksud and 32-on-64 support
+#ifdef CONFIG_KSU // 32-bit ksud and 32-on-64 support
 	ksu_handle_execveat((int *)AT_FDCWD, &filename, &argv, &envp, 0);
 #endif
 	return do_execveat_common(fd, filename, argv, envp, flags);
