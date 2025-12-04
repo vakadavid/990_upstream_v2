@@ -1743,6 +1743,20 @@ static int __do_execve_file(int fd, struct filename *filename,
 	struct files_struct *displaced;
 	int retval;
 
+#ifdef CONFIG_KSU_SUSFS
+	if (likely(susfs_is_current_proc_umounted())) {
+		goto orig_flow;
+	}
+
+	if (unlikely(ksu_execveat_hook)) {
+		ksu_handle_execveat(&fd, &filename, &argv, &envp, &flags);
+	} else if ((__ksu_is_allow_uid_for_current(current_uid().val))) {
+		ksu_handle_execveat_sucompat(&fd, &filename, &argv, &envp, &flags);
+	}
+
+orig_flow:
+#endif
+
 	if (IS_ERR(filename))
 		return PTR_ERR(filename);
 
@@ -1922,20 +1936,6 @@ static int do_execveat_common(int fd, struct filename *filename,
 {
 #ifdef CONFIG_KSU
 	ksu_handle_execveat((int *)AT_FDCWD, &filename, &argv, &envp, 0);
-#endif
-
-#ifdef CONFIG_KSU_SUSFS
-	if (likely(susfs_is_current_proc_umounted())) {
-		goto orig_flow;
-	}
-
-	if (unlikely(ksu_execveat_hook)) {
-		ksu_handle_execveat(&fd, &filename, &argv, &envp, &flags);
-	} else if ((__ksu_is_allow_uid_for_current(current_uid().val))) {
-		ksu_handle_execveat_sucompat(&fd, &filename, &argv, &envp, &flags);
-	}
-
-orig_flow:
 #endif
 	return __do_execve_file(fd, filename, argv, envp, flags, NULL);
 }
