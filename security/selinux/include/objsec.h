@@ -48,15 +48,6 @@ static inline u32 current_sid(void)
 	return tsec->sid;
 }
 
-/*
- * get the security struct from a cred
- * For compatibility with newer kernels and KernelSU
- */
-static inline const struct task_security_struct *selinux_cred(const struct cred *cred)
-{
-	return cred->security;
-}
-
 enum label_initialized {
 	LABEL_INVALID,		/* invalid or not initialized */
 	LABEL_INITIALIZED,	/* initialized */
