@@ -39,16 +39,6 @@ struct task_security_struct {
 };
 
 /*
- * get the subjective security ID of the current task
- */
-static inline u32 current_sid(void)
-{
-	const struct task_security_struct *tsec = current_security();
-
-	return tsec->sid;
-}
-
-/*
  * get the security struct from a cred
  * For compatibility with newer kernels and KernelSU
  */
