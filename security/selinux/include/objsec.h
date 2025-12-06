@@ -39,12 +39,13 @@ struct task_security_struct {
 };
 
 /*
- * get the security struct from a cred
- * For compatibility with newer kernels and KernelSU
+ * get the subjective security ID of the current task
  */
-static inline const struct task_security_struct *selinux_cred(const struct cred *cred)
+static inline u32 current_sid(void)
 {
-	return cred->security;
+	const struct task_security_struct *tsec = current_security();
+
+	return tsec->sid;
 }
 
 enum label_initialized {
