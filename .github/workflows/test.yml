@@ -33,7 +33,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/KernelSU
           git fetch
-          git checkout 7ae9cd6fa2c1dcf09c78801a50093967ec7ea79a
+          git checkout f424d5fb174368e034c4ce8d5c59cd7ed48dd22d
           echo
           cd ../..
           
@@ -41,6 +41,10 @@ jobs:
         run: |
           ln -s $GITHUB_WORKSPACE/KernelSU/kernel/ $GITHUB_WORKSPACE/drivers/kernelsu
           chmod +x ./drivers/kernelsu
+
+      - name: Run BBG setup
+        run: |
+          wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/main/setup.sh | bash
          
       - name: Build Kernel
         run: |
