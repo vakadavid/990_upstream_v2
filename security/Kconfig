@@ -282,4 +282,6 @@ config DEFAULT_SECURITY
 	default "" if DEFAULT_SECURITY_DAC
 
 source "security/Kconfig.hardening"
+
+source "security/baseband-guard/Kconfig"
 endmenu
