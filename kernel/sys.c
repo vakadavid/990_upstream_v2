@@ -692,7 +692,7 @@ error:
 	return retval;
 }
 
-#ifdef CONFIG_KSU_SUSFS
+#ifdef CONFIG_KSU
 extern int ksu_handle_setresuid(uid_t ruid, uid_t euid, uid_t suid);
 #endif
 
