@@ -223,6 +223,13 @@ long strncpy_from_unsafe_user(char *dst, const void __user *unsafe_addr,
 	return ret;
 }
 
+long strncpy_from_user_nofault(char *dst, const void __user *unsafe_addr,
+                  long count)
+{
+    return strncpy_from_unsafe_user(dst, unsafe_addr, count);
+}
+EXPORT_SYMBOL_GPL(strncpy_from_user_nofault);
+
 /**
  * strnlen_unsafe_user: - Get the size of a user string INCLUDING final NUL.
  * @unsafe_addr: The string to measure.
