@@ -1,0 +1,68 @@
+name: Test build
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+        with:
+          submodules: 'true'
+
+      - name: Set up environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libarchive-tools ccache libssl-dev gawk
+
+      - name: Delete old symlink
+        run: |
+          rm -rf $GITHUB_WORKSPACE/drivers/kernelsu
+          
+      - name: Delete old KernelSU
+        run: |
+          rm -rf $GITHUB_WORKSPACE/KernelSU-Next
+          
+      - name: Run setup.sh
+        run: |
+          curl -LSs "https://raw.githubusercontent.com/vakadavid/SukiSU-Ultra/builtin/kernel/setup.sh" | bash -s builtin
+
+      - name: Fetch and checkout KSU at latest commit 
+        run: |
+          cd $GITHUB_WORKSPACE/KernelSU
+          git fetch
+          git checkout 1807820ee3a5544407c36f9dd80d651493f83984
+          echo
+          cd ../..
+          
+      - name: Symlink KSU kernel to drivers
+        run: |
+          ln -s $GITHUB_WORKSPACE/KernelSU/kernel/ $GITHUB_WORKSPACE/drivers/kernelsu
+          chmod +x ./drivers/kernelsu
+         
+      - name: Build Kernel
+        run: |
+          make clean
+          chmod +x ./build_kpm.sh
+          chmod +x ./build_unpatched.sh
+          ./build_kpm.sh -m z3s -k y -r n
+          
+      - name: Find built zips
+        id: find_zips
+        run: |
+          ZIP_FILES=$(find . -type f -name "*.zip")
+          if [[ -z "$ZIP_FILES" ]]; then
+            echo "No ZIPs found! Exiting."
+            exit 1
+          fi
+          echo "ZIP_FILES<<EOF" >> $GITHUB_ENV
+          echo "$ZIP_FILES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          
+      - name: Upload built kernels
+        uses: actions/upload-artifact@v4
+        with:
+          name: ExtremeKRNL
+          path: ${{ env.ZIP_FILES }}
