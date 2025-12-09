@@ -199,9 +199,3 @@ loff_t iomap_apply(struct inode *inode, loff_t pos, loff_t length,
 
 /* direct-io.c: */
 int sb_init_dio_done_wq(struct super_block *sb);
-
-/*
- * fs/stat.c:
- */
-int do_statx(int dfd, const char __user *filename, unsigned flags,
-	     unsigned int mask, struct statx __user *buffer);

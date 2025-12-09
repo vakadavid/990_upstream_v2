@@ -31,7 +31,6 @@
 
 # endif
 
-# define __ARCH_WANT_NEW_STAT
 # define __ARCH_WANT_OLD_READDIR
 # define __ARCH_WANT_OLD_STAT
 # define __ARCH_WANT_SYS_ALARM

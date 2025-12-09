@@ -22,7 +22,6 @@
 #include <linux/compiler.h>
 #include <linux/linkage.h>
 
-#define __ARCH_WANT_NEW_STAT
 #define __ARCH_WANT_OLD_READDIR
 #define __ARCH_WANT_STAT64
 #define __ARCH_WANT_SYS_ALARM
