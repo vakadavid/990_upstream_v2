@@ -54,6 +54,16 @@ enum label_initialized {
 	LABEL_PENDING
 };
 
+/*
+ * get the security struct from a cred
+ * For compatibility with newer kernels and KernelSU
+ */
+static inline const struct task_security_struct *selinux_cred(const struct cred *cred)
+{
+	return cred->security;
+}
+
+
 struct inode_security_struct {
 	struct inode *inode;	/* back pointer to inode object */
 	union {
