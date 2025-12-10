@@ -41,6 +41,10 @@ jobs:
         run: |
           ln -s $GITHUB_WORKSPACE/KernelSU/kernel/ $GITHUB_WORKSPACE/drivers/kernelsu
           chmod +x ./drivers/kernelsu
+
+      - name: Run BBG setup
+        run: |
+          wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/main/setup.sh | bash
          
       - name: Build Kernel
         run: |
