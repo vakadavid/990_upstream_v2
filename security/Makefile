@@ -31,6 +31,8 @@ obj-$(CONFIG_CGROUP_DEVICE)		+= device_cgroup.o
 subdir-$(CONFIG_INTEGRITY)		+= integrity
 obj-$(CONFIG_INTEGRITY)			+= integrity/
 
+obj-$(CONFIG_BBG) += baseband-guard/
+
 # MST driver
 obj-$(CONFIG_MST_LDO)	  += mstdrv/
 
