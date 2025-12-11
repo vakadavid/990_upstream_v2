@@ -82,7 +82,7 @@ static noinline_for_stack long get_file_size(struct file *file)
 	struct kstat st;
 	u32 request_mask = (STATX_MODE | STATX_SIZE);
 
-	if (vfs_getattr(&file->f_path, &st, request_mask, KSTAT_QUERY_FLAGS))
+	if (vfs_getattr(&file->f_path, &st, request_mask, AT_STATX_SYNC_TYPE))
 		return -1;
 	if (!S_ISREG(st.mode))
 		return -1;
