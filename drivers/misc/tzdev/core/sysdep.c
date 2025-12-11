@@ -121,7 +121,7 @@ int sysdep_vfs_getattr(struct file *filp, struct kstat *stat)
 	p.mnt = filp->f_path.mnt;
 	p.dentry = filp->f_path.dentry;
 
-	return vfs_getattr(&p, stat, STATX_SIZE, KSTAT_QUERY_FLAGS);
+	return vfs_getattr(&p, stat, STATX_SIZE, AT_STATX_SYNC_TYPE);
 #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(3,9,0))
 	return vfs_getattr(&filp->f_path, stat);
 #else
