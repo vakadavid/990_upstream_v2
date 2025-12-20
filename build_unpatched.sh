@@ -43,7 +43,7 @@ echo "-----------------------------------------------"
 # Build dtbo
 echo "Building Device Tree Blob Output Image for "$MODEL"..."
 echo "-----------------------------------------------"
-./toolchain/mkdtimg cfg_create build/out/$MODEL/dtbo.img build/dtconfigs/y2s.cfg -d out/arch/arm64/boot/dts/samsung
+./toolchain/mkdtimg cfg_create build/out/$MODEL/dtbo.img build/dtconfigs/z3s.cfg -d out/arch/arm64/boot/dts/samsung
 
 
 # Build ramdisk
