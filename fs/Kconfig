@@ -327,4 +327,10 @@ config FS_HPB
 	bool "Support HPB on Filesystem"
 	default n
 
+config HYMOFS
+	bool "HymoFS support"
+	default y
+	help
+	  HymoFS is a kernel-level path manipulation and hiding framework.
+
 endmenu

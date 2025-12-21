@@ -46,6 +46,9 @@
 
 #include "internal.h"
 #include "mount.h"
+#ifdef CONFIG_HYMOFS
+#include "hymofs.h"
+#endif
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/namei.h>
@@ -140,8 +143,22 @@ extern const struct qstr susfs_fake_qstr_name;
 
 #define EMBEDDED_NAME_MAX	(PATH_MAX - offsetof(struct filename, iname))
 
+#ifdef CONFIG_HYMOFS
+struct filename *__original_getname_flags(const char __user *filename, int flags, int *empty);
+
+/* Hook getname_flags to intercept path lookups */
+struct filename *getname_flags(const char __user *filename, int flags, int *empty)
+{
+	struct filename *result = __original_getname_flags(filename, flags, empty);
+	return hymofs_handle_getname(result);
+}
+#endif
 struct filename *
+#ifdef CONFIG_HYMOFS
+__original_getname_flags(const char __user *filename, int flags, int *empty)
+#else
 getname_flags(const char __user *filename, int flags, int *empty)
+#endif
 {
 	struct filename *result;
 	char *kname;
