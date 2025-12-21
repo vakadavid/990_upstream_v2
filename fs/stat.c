@@ -31,9 +31,6 @@ extern void susfs_sus_ino_for_generic_fillattr(unsigned long ino, struct kstat *
 
 #include "internal.h"
 #include "mount.h"
-#ifdef CONFIG_HYMOFS
-#include "hymofs.h"
-#endif
 
 /**
  * generic_fillattr - Fill in the basic attributes from the inode struct
@@ -113,25 +110,11 @@ int vfs_getattr_nosec(const struct path *path, struct kstat *stat,
 	stat->attributes_mask |= (STATX_ATTR_AUTOMOUNT |
 				  STATX_ATTR_DAX);
 
-#ifdef CONFIG_HYMOFS
-	if (inode->i_op->getattr) {
-		int ret = inode->i_op->getattr(path, stat,
-					    request_mask,
-					    query_flags);
-        if (ret == 0) hymofs_spoof_stat(path, stat);
-        return ret;
-    }
-#else
 	if (inode->i_op->getattr)
 		return inode->i_op->getattr(path, stat, request_mask,
 					    query_flags);
-#endif
 
 	generic_fillattr(inode, stat);
-#ifdef CONFIG_HYMOFS
-	/* HymoFS: Spoof timestamps if needed */
-	hymofs_spoof_stat(path, stat);
-#endif
 	return 0;
 }
 EXPORT_SYMBOL(vfs_getattr_nosec);

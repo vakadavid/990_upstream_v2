@@ -7,9 +7,6 @@
 #include <linux/slab.h>
 #include <linux/prefetch.h>
 #include "mount.h"
-#ifdef CONFIG_HYMOFS
-#include "hymofs.h"
-#endif
 
 static int prepend(char **buffer, int *buflen, const char *str, int namelen)
 {
@@ -281,29 +278,10 @@ char *d_path(const struct path *path, char *buf, int buflen)
 	get_fs_root_rcu(current->fs, &root);
 	error = path_with_deleted(path, &root, &res, &buflen);
 	rcu_read_unlock();
-#ifdef CONFIG_HYMOFS
-	if (error < 0) {
-		return ERR_PTR(error);
-	}
 
-    {
-		char *src = hymofs_reverse_lookup(res);
-		if (src) {
-			if (strlen(src) < buflen) {
-				/* Overwrite with source path for masking */
-				strscpy(buf, src, buflen);
-				kfree(src);
-				return buf;
-			}
-			kfree(src);
-		}
-	    return res;
-    }
-#else
 	if (error < 0)
 		res = ERR_PTR(error);
 	return res;
-#endif
 }
 EXPORT_SYMBOL(d_path);
 

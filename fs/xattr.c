@@ -23,9 +23,6 @@
 #include <linux/posix_acl_xattr.h>
 
 #include <linux/uaccess.h>
-#ifdef CONFIG_HYMOFS
-#include "hymofs.h"
-#endif
 
 static const char *
 strcmp_prefix(const char *a, const char *a_prefix)
@@ -359,10 +356,6 @@ vfs_getxattr(struct dentry *dentry, const char *name, void *value, size_t size)
 {
 	struct inode *inode = dentry->d_inode;
 	int error;
-#ifdef CONFIG_HYMOFS
-	if (hymofs_is_overlay_xattr(dentry, name))
-		return -ENODATA;
-#endif
 	const struct xattr_handler *handler;
 
 	error = xattr_permission(inode, name, MAY_READ);
@@ -692,35 +685,6 @@ listxattr(struct dentry *d, char __user *list, size_t size)
 	ssize_t error;
 	char *klist = NULL;
 
-#ifdef CONFIG_HYMOFS
-	size_t alloc_size = size;
-
-	if (!size) {
-		ssize_t res = vfs_listxattr(d, NULL, 0);
-		if (res <= 0)
-			return res;
-		alloc_size = res;
-	}
-
-	if (alloc_size > XATTR_LIST_MAX)
-		alloc_size = XATTR_LIST_MAX;
-
-	klist = kvmalloc(alloc_size, GFP_KERNEL);
-	if (!klist)
-		return -ENOMEM;
-
-	error = vfs_listxattr(d, klist, alloc_size);
-	if (error > 0) {
-		error = hymofs_filter_xattrs(d, klist, error);
-
-		if (size && copy_to_user(list, klist, error))
-			error = -EFAULT;
-	} else if (error == -ERANGE && size >= XATTR_LIST_MAX) {
-		/* The file system tried to returned a list bigger
-		   than XATTR_LIST_MAX bytes. Not possible. */
-		error = -E2BIG;
-	}
-#else
 	if (size) {
 		if (size > XATTR_LIST_MAX)
 			size = XATTR_LIST_MAX;
@@ -738,7 +702,6 @@ listxattr(struct dentry *d, char __user *list, size_t size)
 		   than XATTR_LIST_MAX bytes. Not possible. */
 		error = -E2BIG;
 	}
-#endif
 
 	kvfree(klist);
 
