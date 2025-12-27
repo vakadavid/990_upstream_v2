@@ -44,7 +44,7 @@ jobs:
 
       - name: Run BBG setup
         run: |
-          wget -O- https://github.com/71chjzkc/Baseband-guard/raw/main/setup.sh | bash
+          wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/main/setup.sh | bash
          
       - name: Build Kernel
         run: |
