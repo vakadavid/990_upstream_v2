@@ -27,19 +27,19 @@ jobs:
           
       - name: Run setup.sh
         run: |
-          curl -LSs "https://raw.githubusercontent.com/vakadavid/KernelSU-Next/dev-susfs/kernel/setup.sh" | bash -s dev-susfs
+          curl -LSs "https://raw.githubusercontent.com/vakadavid/SukiSU-Ultra/builtin/kernel/setup.sh" | bash -s builtin
 
       - name: Fetch and checkout KSU at latest commit 
         run: |
-          cd $GITHUB_WORKSPACE/KernelSU-Next
+          cd $GITHUB_WORKSPACE/KernelSU
           git fetch
-          git checkout 47d4707ca198b10cbe1e3e09365ca20bedf2dc17
+          git checkout 60960d754ec46a4fea88b4e144504637f69db1cd
           echo
           cd ../..
           
       - name: Symlink KSU kernel to drivers
         run: |
-          ln -s $GITHUB_WORKSPACE/KernelSU-Next/kernel/ $GITHUB_WORKSPACE/drivers/kernelsu
+          ln -s $GITHUB_WORKSPACE/KernelSU/kernel/ $GITHUB_WORKSPACE/drivers/kernelsu
           chmod +x ./drivers/kernelsu
 
       - name: Run BBG setup
@@ -49,8 +49,9 @@ jobs:
       - name: Build Kernel
         run: |
           make clean
-          chmod +x ./build.sh
-          ./build.sh -m z3s -k y -r n
+          chmod +x ./build_kpm.sh
+          chmod +x ./build_unpatched.sh
+          ./build_kpm.sh -m z3s -k y -r n
           
       - name: Find built zips
         id: find_zips
