@@ -48,7 +48,7 @@ jobs:
 
       - name: Setup HymoFS
         run: |
-          curl -LSs https://raw.githubusercontent.com/Anatdx/HymoFS/main/setup.sh | -s defconfig arch/arm64/configs/exynos9830_defconfig with-susfs
+          curl -LSs https://raw.githubusercontent.com/Anatdx/HymoFS/main/setup.sh | bash -s defconfig arch/arm64/configs/exynos9830_defconfig with-susfs
 
       - name: Build Kernel
         run: |
