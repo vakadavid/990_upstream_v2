@@ -33,7 +33,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/KernelSU
           git fetch
-          git checkout 0da3f5be73a266faf85e2121bcfcddce6c7b652e
+          git checkout f9d820bd93f60bd480cedbe75d7f0061b097927a
           echo
           cd ../..
           
@@ -44,7 +44,7 @@ jobs:
 
       - name: Run BBG setup
         run: |
-          wget -O- https://github.com/71chjzkc/Baseband-guard/raw/main/setup.sh | bash
+          wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/main/setup.sh | bash
 
 #      - name: Setup HymoFS
 #        run: |
