@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: 'false'
 
@@ -70,7 +70,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
           
       - name: Upload built kernels
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ExtremeKRNL
           path: ${{ env.ZIP_FILES }}
