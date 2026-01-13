@@ -1877,15 +1877,8 @@ static void __dw_mci_start_request(struct dw_mci *host,
 		mod_timer(&host->sto_timer, jiffies + msecs_to_jiffies(500));
 	else if (host->pdata->sw_timeout)
 		mod_timer(&host->sto_timer, jiffies + msecs_to_jiffies(host->pdata->sw_timeout));
-#if defined(CONFIG_HDM)
-	else if (!cmd->data)
-		mod_timer(&host->sto_timer, jiffies + msecs_to_jiffies(1000));
 	else
 		mod_timer(&host->sto_timer, jiffies + msecs_to_jiffies(10000));
-#else
-	else
-		mod_timer(&host->sto_timer, jiffies + msecs_to_jiffies(10000));
-#endif
 	host->slot = slot;
 	host->mrq = mrq;
 

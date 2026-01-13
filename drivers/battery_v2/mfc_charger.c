@@ -73,9 +73,6 @@ extern bool sleep_mode;
 extern unsigned int lpcharge;
 extern bool mfc_fw_update;
 extern bool boot_complete;
-#if defined(CONFIG_MST_V2)
-extern int mfc_send_mst_cmd(int cmd, struct mfc_charger_data *charger, u8 irq_src_l, u8 irq_src_h);
-#endif
 
 static char *rx_device_type_str[] = {
 	"No Dev",
@@ -3381,10 +3378,6 @@ static int mfc_chg_set_property(struct power_supply *psy,
 			charger->is_mst_on = MST_MODE_2;
 			pr_info("%s: set MST mode 2\n", __func__);
 		} else {
-#if defined(CONFIG_MST_V2)
-			// it will send MST driver a message.
-			mfc_send_mst_cmd(0, charger, 0, 0);
-#endif
 			pr_info("%s: set MST mode off\n", __func__);
 			charger->is_mst_on = MST_MODE_0;
 		}
@@ -4826,10 +4819,6 @@ static void mfc_mst_routine(struct mfc_charger_data *charger, u8 irq_src_l, u8 i
 
 	if (charger->is_mst_on == MST_MODE_2) {
 		charger->wc_tx_enable = false;
-#if defined(CONFIG_MST_V2)
-		// it will send MST driver a message.
-		mfc_send_mst_cmd(1, charger, irq_src_l, irq_src_h);
-#endif
 	} else if (charger->wc_tx_enable) {
 		mfc_reg_read(charger->client,MFC_STATUS_H_REG, &data);
 		data &= 0x4; /* AC MISSING DETECT */

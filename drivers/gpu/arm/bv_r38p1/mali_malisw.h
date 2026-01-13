@@ -103,9 +103,13 @@
 #ifndef __fallthrough
 #define __fallthrough  __attribute__((fallthrough))
 #endif /* __fallthrough */
+#ifndef fallthrough
 #define fallthrough    __fallthrough
+#endif
 #else
+#ifndef fallthrough
 #define fallthrough	   CSTD_NOP(...) /* fallthrough */
+#endif
 #endif /* GCC_VERSION >= 70000 */
 #endif /* KERNEL_VERSION(5, 4, 0) */
 

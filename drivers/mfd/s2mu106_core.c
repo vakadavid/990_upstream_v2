@@ -47,9 +47,6 @@ static struct mfd_cell s2mu106_devs[] = {
 #if defined(CONFIG_AFC_S2MU106)
 	{ .name = "s2mu106-afc", },
 #endif
-#if defined(CONFIG_MST_S2MU106)
-	{ .name = "s2mu106-mst", },
-#endif
 #if defined(CONFIG_PM_S2MU106)
 	{ .name = "s2mu106-powermeter", },
 #endif

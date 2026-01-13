@@ -84,10 +84,6 @@ static struct i2c_client *get_i2c(struct s2mu106_dev *s2mu106,
 	case PM_VALUP1 ... PM_INT2:
 		return s2mu106->muic;
 #endif
-#if defined(CONFIG_MST_S2MU106)
-	case MST_INT:
-		return s2mu106->muic;
-#endif
 #if defined(CONFIG_MOTOR_S2MU106)
 	case HAPTIC_INT:
 		return s2mu106->haptic;
@@ -202,13 +198,6 @@ static const struct s2mu106_irq_data s2mu106_irqs[] = {
 	DECLARE_IRQ(S2MU106_PM_IRQ2_IOTGUP,	PM_INT2,	1 << 4),
 	DECLARE_IRQ(S2MU106_PM_IRQ2_IWCINUP,	PM_INT2,	1 << 6),
 	DECLARE_IRQ(S2MU106_PM_IRQ2_ICHGINUP,	PM_INT2,	1 << 7),
-#endif
-#if defined(CONFIG_MST_S2MU106)
-	DECLARE_IRQ(S2MU106_MST_IRQ_SHORT,	MST_INT,	1 << 3);
-	DECLARE_IRQ(S2MU106_MST_IRQ_OCP,	MST_INT,	1 << 4);
-	DECLARE_IRQ(S2MU106_MST_IRQ_EN_OVL,	MST_INT,	1 << 5);
-	DECLARE_IRQ(S2MU106_MST_IRQ_DONE,	MST_INT,	1 << 6);
-	DECLARE_IRQ(S2MU106_MST_IRQ_EN,		MST_INT,	1 << 7);
 #endif
 #if defined(CONFIG_MOTOR_S2MU106)
 	DECLARE_IRQ(S2MU106_HAPTIC_IRQ_OCP,	HAPTIC_INT,	1 << 0);
@@ -345,10 +334,6 @@ static irqreturn_t s2mu106_irq_thread(int irq, void *data)
 				irq_reg[PM_VALUP1], irq_reg[PM_VALUP2], irq_reg[PM_INT1], irq_reg[PM_INT2]);
 	}
 #endif
-#if defined(CONFIG_MST_S2MU106)
-	if (irq_src & S2MU106_IRQSRC_MST) {
-	}
-#endif
 #if defined(CONFIG_MOTOR_S2MU106)
 	if (irq_src & S2MU106_IRQSRC_HAPTIC) {
 	}
@@ -450,9 +435,6 @@ int s2mu106_irq_init(struct s2mu106_dev *s2mu106)
 #endif
 #if defined(CONFIG_PM_S2MU106)
 	i2c_data &= ~(S2MU106_IRQSRC_PM);
-#endif
-#if defined(CONFIG_MST_S2MU106)
-	i2c_data &= ~(S2MU106_IRQSRC_MST);
 #endif
 #if defined(CONFIG_MOTOR_S2MU106)
 	i2c_data &= ~(S2MU106_IRQSRC_HAPTIC);

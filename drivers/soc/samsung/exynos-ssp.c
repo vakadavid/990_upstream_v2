@@ -217,16 +217,16 @@ static int exynos_ssp_powerctl_update(struct device *dev, bool power_on, bool pa
 
 	if (power_on == 1 && pass == 1) {
 		link->init_count++;
-		link->init_time = ktime_get_boot_ns() / NSEC_PER_USEC;
+		link->init_time = ktime_get_boottime_ns() / NSEC_PER_USEC;
 	} else if (power_on == 1 && pass == 0) {
 		link->init_fail_count++;
-		link->init_fail_time = ktime_get_boot_ns() / NSEC_PER_USEC;
+		link->init_fail_time = ktime_get_boottime_ns() / NSEC_PER_USEC;
 	} else if (power_on == 0 && pass == 1) {
 		link->exit_count++;
-		link->exit_time = ktime_get_boot_ns() / NSEC_PER_USEC;
+		link->exit_time = ktime_get_boottime_ns() / NSEC_PER_USEC;
 	} else if (power_on == 0 && pass == 0) {
 		link->exit_fail_count++;
-		link->exit_fail_time = ktime_get_boot_ns() / NSEC_PER_USEC;
+		link->exit_fail_time = ktime_get_boottime_ns() / NSEC_PER_USEC;
 	}
 
 	return ret;
