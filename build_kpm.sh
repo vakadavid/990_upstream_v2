@@ -196,7 +196,7 @@ cd SukiSUPatch
 #TAG=$(curl -s https://api.github.com/repos/SukiSU-Ultra/SukiSU_KernelPatch_patch/releases | jq -r 'map(select(.latest)) | first | .tag_name')
 #echo "Latest tag is: $TAG"
 #curl -Ls -o patch_linux "https://github.com/SukiSU-Ultra/SukiSU_KernelPatch_patch/releases/download/$TAG/patch_linux"
-wget https://github.com/SukiSU-Ultra/SukiSU_KernelPatch_patch/releases/download/0.12.2/patch_linux
+wget https://github.com/SukiSU-Ultra/SukiSU_KernelPatch_patch/releases/download/0.12.5/patch_linux
 chmod +x patch_linux
 mv ../Image ./Image
 echo "Patching kernel..."
