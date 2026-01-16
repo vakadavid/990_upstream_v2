@@ -557,4 +557,3 @@ int __init secdbg_freq_init(void)
 
 	return 0;
 }
-subsys_initcall(secdbg_freq_init);
