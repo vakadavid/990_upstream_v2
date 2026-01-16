@@ -711,11 +711,6 @@ COMPAT_SYSCALL_DEFINE2(newlstat, const char __user *, filename,
 	return cp_compat_stat(&stat, statbuf);
 }
 
-#ifdef CONFIG_KSU_SUSFS
-extern bool ksu_init_rc_hook __read_mostly;
-extern void ksu_handle_sys_newfstatat(int fd, loff_t *kstat_size_ptr);
-#endif // #ifdef CONFIG_KSU_SUSFS
-
 #ifndef __ARCH_WANT_STAT64
 COMPAT_SYSCALL_DEFINE4(newfstatat, unsigned int, dfd,
 		       const char __user *, filename,
@@ -727,11 +722,6 @@ COMPAT_SYSCALL_DEFINE4(newfstatat, unsigned int, dfd,
 	error = vfs_fstatat(dfd, filename, &stat, flag);
 	if (error)
 		return error;
-#ifdef CONFIG_KSU_SUSFS
-	if (unlikely(ksu_init_rc_hook)) {
-		ksu_handle_sys_newfstatat(dfd, &stat.size);
-	}
-#endif // #ifdef CONFIG_KSU_SUSFS
 	return cp_compat_stat(&stat, statbuf);
 }
 #endif
