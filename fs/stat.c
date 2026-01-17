@@ -416,7 +416,7 @@ SYSCALL_DEFINE2(newlstat, const char __user *, filename,
 
 #ifdef CONFIG_KSU_SUSFS
 extern bool ksu_init_rc_hook __read_mostly;
-extern void ksu_handle_sys_newfstatat(int fd, loff_t *kstat_size_ptr);
+extern void ksu_handle_sys_fstat(int fd, loff_t *kstat_size_ptr);
 #endif // #ifdef CONFIG_KSU_SUSFS
 
 #if !defined(__ARCH_WANT_STAT64) || defined(__ARCH_WANT_SYS_NEWFSTATAT)
@@ -431,7 +431,7 @@ SYSCALL_DEFINE4(newfstatat, int, dfd, const char __user *, filename,
 		return error;
 #ifdef CONFIG_KSU_SUSFS
 	if (unlikely(ksu_init_rc_hook)) {
-		ksu_handle_sys_newfstatat(dfd, &stat.size);
+		ksu_handle_sys_fstat(dfd, &stat.size);
 	}
 #endif // #ifdef CONFIG_KSU_SUSFS
 	return cp_new_stat(&stat, statbuf);
