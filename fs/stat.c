@@ -162,6 +162,12 @@ EXPORT_SYMBOL(vfs_getattr);
  *
  * 0 will be returned on success, and a -ve error code if unsuccessful.
  */
+
+#ifdef CONFIG_KSU_SUSFS
+extern bool ksu_init_rc_hook __read_mostly;
+extern void ksu_handle_vfs_fstat(int fd, loff_t *kstat_size_ptr);
+#endif // #ifdef CONFIG_KSU_SUSFS
+
 int vfs_fstat(int fd, struct kstat *stat)
 {
 	struct fd f;
@@ -171,6 +177,11 @@ int vfs_fstat(int fd, struct kstat *stat)
 	if (!f.file)
 		return -EBADF;
 	error = vfs_getattr(&f.file->f_path, stat, STATX_BASIC_STATS, 0);
+#ifdef CONFIG_KSU_SUSFS
+	if (unlikely(ksu_init_rc_hook)) {
+		ksu_handle_vfs_fstat(fd, &stat->size);
+	}
+#endif // #ifdef CONFIG_KSU_SUSFS
 	fdput(f);
 	return error;
 }
@@ -414,11 +425,6 @@ SYSCALL_DEFINE2(newlstat, const char __user *, filename,
 	return cp_new_stat(&stat, statbuf);
 }
 
-#ifdef CONFIG_KSU_SUSFS
-extern bool ksu_init_rc_hook __read_mostly;
-extern void ksu_handle_sys_fstat(int fd, loff_t *kstat_size_ptr);
-#endif // #ifdef CONFIG_KSU_SUSFS
-
 #if !defined(__ARCH_WANT_STAT64) || defined(__ARCH_WANT_SYS_NEWFSTATAT)
 SYSCALL_DEFINE4(newfstatat, int, dfd, const char __user *, filename,
 		struct stat __user *, statbuf, int, flag)
@@ -429,11 +435,6 @@ SYSCALL_DEFINE4(newfstatat, int, dfd, const char __user *, filename,
 	error = vfs_fstatat(dfd, filename, &stat, flag);
 	if (error)
 		return error;
-#ifdef CONFIG_KSU_SUSFS
-	if (unlikely(ksu_init_rc_hook)) {
-		ksu_handle_sys_fstat(dfd, &stat.size);
-	}
-#endif // #ifdef CONFIG_KSU_SUSFS
 	return cp_new_stat(&stat, statbuf);
 }
 #endif
@@ -751,11 +752,11 @@ COMPAT_SYSCALL_DEFINE2(newfstat, unsigned int, fd,
 /* Caller is here responsible for sufficient locking (ie. inode->i_lock) */
 void __inode_add_bytes(struct inode *inode, loff_t bytes)
 {
-	inode->i_blocks += bytes >> 9;
+	inode->i_blocks = bytes >> 9;
 	bytes &= 511;
-	inode->i_bytes += bytes;
+	inode->i_bytes = bytes;
 	if (inode->i_bytes >= 512) {
-		inode->i_blocks++;
+		inode->i_blocks;
 		inode->i_bytes -= 512;
 	}
 }
@@ -776,7 +777,7 @@ void __inode_sub_bytes(struct inode *inode, loff_t bytes)
 	bytes &= 511;
 	if (inode->i_bytes < bytes) {
 		inode->i_blocks--;
-		inode->i_bytes += 512;
+		inode->i_bytes = 512;
 	}
 	inode->i_bytes -= bytes;
 }
