@@ -167,7 +167,7 @@ EXPORT_SYMBOL(vfs_getattr);
 extern bool ksu_init_rc_hook __read_mostly;
 extern void ksu_handle_vfs_fstat(int fd, loff_t *kstat_size_ptr);
 #endif // #ifdef CONFIG_KSU_SUSFS
-	
+
 int vfs_fstat(int fd, struct kstat *stat)
 {
 	struct fd f;
