@@ -22,7 +22,6 @@ struct super_block;
 struct vfsmount;
 struct dentry;
 struct mnt_namespace;
-struct fs_context;
 
 #define MNT_NOSUID	0x01
 #define MNT_NODEV	0x02
@@ -92,7 +91,7 @@ extern void mnt_drop_write_file(struct file *file);
 extern void mntput(struct vfsmount *mnt);
 extern struct vfsmount *mntget(struct vfsmount *mnt);
 extern struct vfsmount *mnt_clone_internal(const struct path *path);
-extern bool __mnt_is_readonly(struct vfsmount *mnt);
+extern int __mnt_is_readonly(struct vfsmount *mnt);
 extern bool mnt_may_suid(struct vfsmount *mnt);
 
 struct path;
@@ -101,8 +100,6 @@ extern int __mnt_want_write(struct vfsmount *);
 extern void __mnt_drop_write(struct vfsmount *);
 
 struct file_system_type;
-extern struct vfsmount *fc_mount(struct fs_context *fc);
-extern struct vfsmount *vfs_create_mount(struct fs_context *fc);
 extern struct vfsmount *vfs_kern_mount(struct file_system_type *type,
 				      int flags, const char *name,
 				      void *data);
