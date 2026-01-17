@@ -3744,7 +3744,7 @@ void kern_unmount(struct vfsmount *mnt)
 	/* release long term mount so mount point can be released */
 	if (!IS_ERR_OR_NULL(mnt)) {
 		real_mount(mnt)->mnt_ns = NULL;
-	synchronize_rcu_expedited();		/* yecchhh... */
+		synchronize_rcu_expedited();	/* yecchhh... */
 		mntput(mnt);
 	}
 }
