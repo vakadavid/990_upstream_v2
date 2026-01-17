@@ -167,7 +167,7 @@ EXPORT_SYMBOL(vfs_getattr);
 extern bool ksu_init_rc_hook __read_mostly;
 extern void ksu_handle_vfs_fstat(int fd, loff_t *kstat_size_ptr);
 #endif // #ifdef CONFIG_KSU_SUSFS
-
+	
 int vfs_fstat(int fd, struct kstat *stat)
 {
 	struct fd f;
@@ -752,11 +752,11 @@ COMPAT_SYSCALL_DEFINE2(newfstat, unsigned int, fd,
 /* Caller is here responsible for sufficient locking (ie. inode->i_lock) */
 void __inode_add_bytes(struct inode *inode, loff_t bytes)
 {
-	inode->i_blocks = bytes >> 9;
+	inode->i_blocks += bytes >> 9;
 	bytes &= 511;
-	inode->i_bytes = bytes;
+	inode->i_bytes += bytes;
 	if (inode->i_bytes >= 512) {
-		inode->i_blocks;
+		inode->i_blocks++;
 		inode->i_bytes -= 512;
 	}
 }
@@ -777,7 +777,7 @@ void __inode_sub_bytes(struct inode *inode, loff_t bytes)
 	bytes &= 511;
 	if (inode->i_bytes < bytes) {
 		inode->i_blocks--;
-		inode->i_bytes = 512;
+		inode->i_bytes += 512;
 	}
 	inode->i_bytes -= bytes;
 }
