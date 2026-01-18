@@ -378,10 +378,6 @@ static void show_vma_header_prefix(struct seq_file *m,
 	seq_putc(m, ' ');
 }
 
-#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
-extern void susfs_sus_ino_for_show_map_vma(unsigned long ino, dev_t *out_dev, unsigned long *out_ino);
-#endif
-
 static void show_vma_header_prefix_fake(struct seq_file *m,
 					unsigned long start, unsigned long end,
 					vm_flags_t flags, unsigned long long pgoff,
@@ -398,6 +394,10 @@ static void show_vma_header_prefix_fake(struct seq_file *m,
 			pgoff,
 			MAJOR(dev), MINOR(dev), ino);
 }
+
+#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
+extern void susfs_sus_ino_for_show_map_vma(unsigned long ino, dev_t *out_dev, unsigned long *out_ino);
+#endif
 
 static void
 show_map_vma(struct seq_file *m, struct vm_area_struct *vma)
@@ -998,7 +998,7 @@ static int show_smap(struct seq_file *m, void *v)
 		SEQ_PUT_DEC(" kB\nKernelPageSize: ", vma_kernel_pagesize(vma));
 		SEQ_PUT_DEC(" kB\nMMUPageSize:    ", vma_mmu_pagesize(vma));
 		seq_puts(m, " kB\n");
-		__show_smap(m, &mss);
+		__show_smap(m, &mss, false);
 		seq_printf(m, "THPeligible:    %d\n", 0);
 		if (arch_pkeys_enabled())
 				seq_printf(m, "ProtectionKey:  %8u\n", vma_pkey(vma));
