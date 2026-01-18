@@ -424,11 +424,11 @@ static struct mount *alloc_vfsmnt(const char *name)
 		mnt->mnt_count = 1;
 		mnt->mnt_writers = 0;
 #endif
+		mnt->mnt.data = NULL;
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 		// Make sure mnt->mnt.susfs_mnt_id_backup is initialized every time.
 		mnt->mnt.susfs_mnt_id_backup = 0;
 #endif
-		mnt->mnt.data = NULL;
 
 		INIT_HLIST_NODE(&mnt->mnt_hash);
 		INIT_LIST_HEAD(&mnt->mnt_child);
