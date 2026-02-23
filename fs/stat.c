@@ -17,11 +17,11 @@
 #include <linux/syscalls.h>
 #include <linux/pagemap.h>
 #include <linux/compat.h>
+
 #ifdef CONFIG_KSU_SUSFS
 #include <linux/susfs_def.h>
 #include <linux/version.h>
 #endif
-
 #include <linux/uaccess.h>
 #include <asm/unistd.h>
 
@@ -50,8 +50,8 @@ void generic_fillattr(struct inode *inode, struct kstat *stat)
 		susfs_sus_ino_for_generic_fillattr(inode->i_ino, stat);
 		stat->mode = inode->i_mode;
 		stat->rdev = inode->i_rdev;
-		stat->uid = inode->i_uid;
-		stat->gid = inode->i_gid;
+		stat->uid = i_uid_into_mnt(mnt_userns, inode);
+		stat->gid = i_gid_into_mnt(mnt_userns, inode);
 		return;
 	}
 #endif

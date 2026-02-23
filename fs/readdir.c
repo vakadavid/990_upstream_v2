@@ -211,7 +211,7 @@ static int fillonedir(struct dir_context *ctx, const char *name, int namlen,
 	}
 	if (susfs_is_inode_sus_path(inode)) {
 		iput(inode);
-		return 0;
+		return true;
 	}
 	iput(inode);
 orig_flow:
@@ -306,6 +306,9 @@ static int filldir(struct dir_context *ctx, const char *name, int namlen,
 		buf->error = -EOVERFLOW;
 		return -EOVERFLOW;
 	}
+	dirent = buf->previous;
+	if (dirent && signal_pending(current))
+		return -EINTR;
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 	inode = ilookup(buf->sb, ino);
 	if (!inode) {
@@ -313,14 +316,11 @@ static int filldir(struct dir_context *ctx, const char *name, int namlen,
 	}
 	if (susfs_is_inode_sus_path(inode)) {
 		iput(inode);
-		return 0;
+		return true;
 	}
 	iput(inode);
 orig_flow:
 #endif
-	dirent = buf->previous;
-	if (dirent && signal_pending(current))
-		return -EINTR;
 
 	/*
 	 * Note! This range-checks 'previous' (which may be NULL).
@@ -421,7 +421,7 @@ static int filldir64(struct dir_context *ctx, const char *name, int namlen,
 	}
 	if (susfs_is_inode_sus_path(inode)) {
 		iput(inode);
-		return 0;
+		return true;
 	}
 	iput(inode);
 orig_flow:
@@ -547,7 +547,7 @@ static int compat_fillonedir(struct dir_context *ctx, const char *name,
 	}
 	if (susfs_is_inode_sus_path(inode)) {
 		iput(inode);
-		return 0;
+		return true;
 	}
 	iput(inode);
 orig_flow:
@@ -640,7 +640,7 @@ static int compat_filldir(struct dir_context *ctx, const char *name, int namlen,
 	}
 	if (susfs_is_inode_sus_path(inode)) {
 		iput(inode);
-		return 0;
+		return true;
 	}
 	iput(inode);
 orig_flow:
