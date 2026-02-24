@@ -325,7 +325,7 @@ out_free_cache:
 /* A copy of alloc_vfsmnt() but allocates the fake mnt_id for mount
  * that is mounted or single cloned by ksu process
  */
-+static struct mount *susfs_alloc_non_unshare_ksu_vfsmnt(const char *name)
+static struct mount *susfs_alloc_non_unshare_ksu_vfsmnt(const char *name)
 {
 	struct mount *mnt = kmem_cache_zalloc(mnt_cache, GFP_KERNEL);
 	int res;
