@@ -63,7 +63,7 @@ if [ ! -f "$CLANG_DIR/bin/clang-14" ]; then
     rm -rf $CLANG_DIR
     mkdir -p $CLANG_DIR
     pushd $CLANG_DIR > /dev/null
-    curl -LJOk https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/tags/android-13.0.0_r13/clang-r450784d.tar.gz
+    curl -JOk https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/tags/android-13.0.0_r13/clang-r450784d.tar.gz
     tar xf android-13.0.0_r13-clang-r450784d.tar.gz
     rm android-13.0.0_r13-clang-r450784d.tar.gz
     echo "Cleaning up..."
