@@ -1325,13 +1325,6 @@ bypass_orig_flow:
 
 	mnt->mnt.mnt_flags = old->mnt.mnt_flags;
 	mnt->mnt.mnt_flags &= ~(MNT_WRITE_HOLD|MNT_MARKED|MNT_INTERNAL);
-
-#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
-	if (unlikely(is_mnt_ksu_unshared)) {
-		mnt->mnt.mnt_flags |= VFSMOUNT_MNT_FLAGS_KSU_UNSHARED_MNT;
-	}
-#endif // #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
-
 	/* Don't allow unprivileged users to change mount flags */
 	if (flag & CL_UNPRIVILEGED) {
 		mnt->mnt.mnt_flags |= MNT_LOCK_ATIME;
@@ -1353,6 +1346,13 @@ bypass_orig_flow:
 	if ((flag & CL_UNPRIVILEGED) &&
 	    (!(flag & CL_EXPIRE) || list_empty(&old->mnt_expire)))
 		mnt->mnt.mnt_flags |= MNT_LOCKED;
+
+#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
+	if (unlikely(is_mnt_ksu_unshared)) {
+		mnt->mnt.mnt_flags |= VFSMOUNT_MNT_FLAGS_KSU_UNSHARED_MNT;
+	}
+#endif // #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
+
 	atomic_inc(&sb->s_active);
 	mnt->mnt.mnt_sb = sb;
 	mnt->mnt.mnt_root = dget(root);
