@@ -109,7 +109,7 @@ int vfs_getattr_nosec(const struct path *path, struct kstat *stat,
 	if (inode->i_op->getattr)
 #ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
 	{
-		int err = inode->i_op->getattr(mnt_userns, path, stat,
+		int err = inode->i_op->getattr(path, stat,
 					    request_mask, query_flags);
 		if (!err)
 			susfs_generic_fillattr_spoofer(inode, stat);
