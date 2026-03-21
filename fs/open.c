@@ -1129,7 +1129,7 @@ retry:
 
 #ifdef CONFIG_KSU_SUSFS_OPEN_REDIRECT
 		if (f && !IS_ERR(f) && !is_inode_open_redirect) {
-			if (PRE_CHECK_OPEN_REDIRECT_WITHOUT_UID_CHECK(file_inode(f))) {
+			if (SUSFS_IS_INODE_OPEN_REDIRECT_WITHOUT_UID_CHECK(file_inode(f))) {
 				if (!susfs_open_redirect_spoof_do_sys_openat(file_inode(f), &tmp)) {
 					is_inode_open_redirect = true;
 					filp_close(f, NULL);
