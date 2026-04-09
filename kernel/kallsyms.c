@@ -24,6 +24,9 @@
 #include <linux/filter.h>
 #include <linux/ftrace.h>
 #include <linux/compiler.h>
+#ifdef CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS
+#include <linux/susfs_def.h>
+#endif // #ifdef CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS
 
 /*
  * These will be re-linked against their real values
@@ -645,10 +648,6 @@ static void s_stop(struct seq_file *m, void *p)
 {
 }
 
-#ifdef CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS
-extern bool susfs_starts_with(const char *str, const char *prefix);
-#endif
-
 static int s_show(struct seq_file *m, void *p)
 {
 	void *value;
@@ -673,8 +672,8 @@ static int s_show(struct seq_file *m, void *p)
 			   type, iter->name, iter->module_name);
 	} else
 #ifndef CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS
-		seq_printf(m, "%px %c %s\n", value,
-			   iter->type, iter->name);
+ 		seq_printf(m, "%px %c %s\n", value,
+ 			   iter->type, iter->name);
 #else
 	{
 		if (susfs_starts_with(iter->name, "ksu_") ||
