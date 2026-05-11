@@ -396,7 +396,6 @@ show_map_vma(struct seq_file *m, struct vm_area_struct *vma)
 	unsigned long start, end;
 	dev_t dev = 0;
 	const char *name = NULL;
-	struct dentry *dentry;
 #ifdef CONFIG_KSU_SUSFS_OPEN_REDIRECT
 	char *spoofed_redirected_name = NULL;
 #endif // #ifdef CONFIG_KSU_SUSFS_OPEN_REDIRECT
@@ -431,7 +430,6 @@ orig_flow:
 	end = vma->vm_end;
 	show_vma_header_prefix(m, start, end, flags, pgoff, dev, ino);
 
-	bypass:
 	/*
 	 * Print the dentry name for named mappings, and a
 	 * special [heap] marker for the heap:
