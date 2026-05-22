@@ -43,6 +43,9 @@
 #define V4L2_PIX_FMT_HEVC     v4l2_fourcc('H', 'E', 'V', 'C') /* HEVC */
 #define V4L2_PIX_FMT_BPG      v4l2_fourcc('B', 'P', 'G', '0') /* BPG */
 
+/* One UI 8 Screen Recorder Color Format Shim */
+#define V4L2_PIX_FMT_YUV420P16_ONEUI8 v4l2_fourcc('Y', 'U', '1', '6') /* 0x7f42016b */
+
 enum v4l2_mpeg_mfc51_video_frame_type {
 	V4L2_MPEG_MFC51_VIDEO_FRAME_TYPE_NOT_CODED	= 0,
 	V4L2_MPEG_MFC51_VIDEO_FRAME_TYPE_I_FRAME	= 1,
