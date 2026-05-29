@@ -27,13 +27,13 @@ jobs:
           
       - name: Run setup.sh
         run: |
-          curl -LSs "https://raw.githubusercontent.com/vakadavid/ReSukiSU/main/kernel/setup.sh" | bash -s main
+          curl -LSs "https://raw.githubusercontent.com/vakadavid/ReSukiSU/sync-upstream/kernel/setup.sh" | bash -s sync-upstream
 
       - name: Fetch and checkout KSU at latest commit 
         run: |
           cd $GITHUB_WORKSPACE/KernelSU
           git fetch
-          git checkout 663f298dbcdad6f06d28962c54bd4c923da36a2a
+          git checkout 61bd393489f5e65f9fa17a91a308eacec1931c4a
           echo
           cd ../..
           

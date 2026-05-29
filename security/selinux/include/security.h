@@ -13,6 +13,7 @@
 #include <linux/dcache.h>
 #include <linux/magic.h>
 #include <linux/types.h>
+#include <linux/rcupdate.h>
 #include <linux/refcount.h>
 #include <linux/workqueue.h>
 #include "flask.h"
@@ -109,6 +110,9 @@ struct selinux_state {
 	bool policycap[__POLICYDB_CAPABILITY_MAX];
 	bool android_netlink_route;
 	bool android_netlink_getneigh;
+
+	struct page *status_page;
+	struct mutex status_lock;
 
 	struct selinux_avc *avc;
 	struct selinux_ss *ss;
