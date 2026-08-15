@@ -3847,7 +3847,7 @@ static struct file *path_openat(struct nameidata *nd,
 				restore_nameidata();
 				set_nameidata(nd, old_dfd, fake_filename);
 				new_s = path_init(nd, flags);
-				while (!(error = link_path_walks(new_s, nd)) &&
+				while (!(error = link_path_walk(new_s, nd)) &&
 				       (error = do_last(nd, file, op)) > 0) {
 			nd->flags &= ~(LOOKUP_OPEN|LOOKUP_CREATE|LOOKUP_EXCL);
 			new_s = trailing_symlink(nd);
