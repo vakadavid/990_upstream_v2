@@ -189,26 +189,6 @@ PAGESIZE=2048
 RAMDISK=build/out/$MODEL/ramdisk.cpio.gz
 OUTPUT_FILE=build/out/$MODEL/boot.img
 
-## KPM Injection
-cd out/arch/arm64/boot/
-mkdir SukiSUPatch
-cd SukiSUPatch
-#TAG=$(curl -s https://api.github.com/repos/SukiSU-Ultra/SukiSU_KernelPatch_patch/releases | jq -r 'map(select(.latest)) | first | .tag_name')
-#echo "Latest tag is: $TAG"
-#curl -Ls -o patch_linux "https://github.com/SukiSU-Ultra/SukiSU_KernelPatch_patch/releases/download/$TAG/patch_linux"
-wget https://github.com/SukiSU-Ultra/SukiSU_KernelPatch_patch/releases/download/0.13.0/patch_linux
-chmod +x patch_linux
-mv ../Image ./Image
-echo "Patching kernel..."
-echo "-----------------------------------------------"
-./patch_linux
-mv ./Image ../unpatched_Image
-mv -f oImage Image
-cp Image ../Image
-cd ..
-rm -rf SukiSUPatch
-cd ../../../../
-
 ## Build auxiliary boot.img files
 # Copy kernel to build
 if [ -z "$DTBS" ]; then
@@ -267,6 +247,3 @@ fi
 
 popd > /dev/null
 echo "Build finished successfully!"
-
-echo "making unpatched Image"
-./build_unpatched.sh
