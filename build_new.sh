@@ -175,7 +175,7 @@ ${SCRIPT_DIR}/toolchain/mkbootimg \
     --cmdline "androidboot.hardware=exynos990 loop.max_part=7" \
     --dtb $DTB_PATH --dtb_offset 0x00000000 --hashtype sha1 \
     --header_version 2 --kernel $KERNEL_PATH --kernel_offset 0x00008000 \
-    --os_patch_level 2025-08 --os_version 16.0.0 --pagesize 2048 \
+    --os_patch_level 2026-05 --os_version 16.0.0 --pagesize 2048 \
     --ramdisk $RAMDISK --ramdisk_offset 0x01000000 \
     --second_offset 0xF0000000 --tags_offset 0x00000100 \
     -o $BOOT_IMG || abort
