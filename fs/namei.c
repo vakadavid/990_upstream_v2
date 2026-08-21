@@ -3836,6 +3836,7 @@ static struct file *path_openat(struct nameidata *nd,
 			(error = do_last(nd, file, op)) > 0) {
 			nd->flags &= ~(LOOKUP_OPEN|LOOKUP_CREATE|LOOKUP_EXCL);
 			s = trailing_symlink(nd);
+		}
 #ifdef CONFIG_KSU_SUSFS_OPEN_REDIRECT
 		if (!error && old_dfd != -1 &&
 			SUSFS_IS_INODE_OPEN_REDIRECT_WITHOUT_UID_CHECK(nd->path.dentry->d_inode))
@@ -3848,14 +3849,13 @@ static struct file *path_openat(struct nameidata *nd,
 				set_nameidata(nd, old_dfd, fake_filename);
 				new_s = path_init(nd, flags);
 				while (!(error = link_path_walk(new_s, nd)) &&
-				       (error = do_last(nd, file, op)) > 0) {
-			nd->flags &= ~(LOOKUP_OPEN|LOOKUP_CREATE|LOOKUP_EXCL);
-			new_s = trailing_symlink(nd);
+					(error = do_last(nd, file, op)) > 0) {
+					nd->flags &= ~(LOOKUP_OPEN|LOOKUP_CREATE|LOOKUP_EXCL);
+					new_s = trailing_symlink(nd);
 				}
 			}
 		}
 #endif // #ifdef CONFIG_KSU_SUSFS_OPEN_REDIRECT
-		}
 		terminate_walk(nd);
 	}
 #ifdef CONFIG_KSU_SUSFS_OPEN_REDIRECT
