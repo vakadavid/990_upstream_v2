@@ -1757,7 +1757,7 @@ static int __do_execve_file(int fd, struct filename *filename,
 		return PTR_ERR(filename);
 
 #ifdef CONFIG_KSU_SUSFS
-	if (likely(susfs_is_current_proc_umounted()))
+	if (likely(susfs_is_current_proc_no_su()))
 		goto orig_flow;
 
 	if (static_branch_likely(&ksu_su_compat_enabled)) {
