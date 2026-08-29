@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           submodules: 'false'
 
@@ -33,7 +33,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/KernelSU
           git fetch
-          git checkout d693fe9a85c4d4d8d43c591a5d906934d768629e
+          git checkout 9a3fd927cd333911c11b6a49aec472e19c4ddff4
           echo
           cd ../..
           
