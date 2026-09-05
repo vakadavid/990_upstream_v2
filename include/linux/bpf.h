@@ -17,7 +17,6 @@
 #include <linux/numa.h>
 #include <linux/mm_types.h>
 #include <linux/wait.h>
-#include <linux/poll.h>
 #include <linux/u64_stats_sync.h>
 #include <linux/refcount.h>
 #include <linux/mutex.h>
@@ -95,9 +94,6 @@ struct bpf_map_ops {
 			     const struct btf *btf,
 			     const struct btf_type *key_type,
 			     const struct btf_type *value_type);
-	int (*map_mmap)(struct bpf_map *map, struct vm_area_struct *vma);
-	__poll_t (*map_poll)(struct bpf_map *map, struct file *filp,
-			     struct poll_table_struct *pts);
 
 	/* Prog poke tracking helpers. */
 	int (*map_poke_track)(struct bpf_map *map, struct bpf_prog_aux *aux);
@@ -260,13 +256,6 @@ bool bpf_map_meta_equal(const struct bpf_map *meta0,
 			const struct bpf_map *meta1);
 
 extern const struct bpf_map_ops bpf_map_offload_ops;
-
-extern const struct bpf_map_ops ringbuf_map_ops;
-extern const struct bpf_func_proto bpf_ringbuf_output_proto;
-extern const struct bpf_func_proto bpf_ringbuf_reserve_proto;
-extern const struct bpf_func_proto bpf_ringbuf_submit_proto;
-extern const struct bpf_func_proto bpf_ringbuf_discard_proto;
-extern const struct bpf_func_proto bpf_ringbuf_query_proto;
 
 /* function argument constraints */
 enum bpf_arg_type {

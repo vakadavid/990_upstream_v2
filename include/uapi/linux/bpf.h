@@ -3919,29 +3919,6 @@ enum bpf_func_id {
 
 /* All flags used by eBPF helper functions, placed here. */
 
-/* BPF_FUNC_ringbuf_submit, BPF_FUNC_ringbuf_discard and
- * BPF_FUNC_ringbuf_output flags.
- */
-enum {
-	BPF_RB_NO_WAKEUP	= (1ULL << 0),
-	BPF_RB_FORCE_WAKEUP	= (1ULL << 1),
-};
-
-/* BPF_FUNC_ringbuf_query flags. */
-enum {
-	BPF_RB_AVAIL_DATA = 0,
-	BPF_RB_RING_SIZE = 1,
-	BPF_RB_CONS_POS = 2,
-	BPF_RB_PROD_POS = 3,
-};
-
-/* Ring buffer record header layout shared with userspace. */
-enum {
-	BPF_RINGBUF_BUSY_BIT	 = (1U << 31),
-	BPF_RINGBUF_DISCARD_BIT = (1U << 30),
-	BPF_RINGBUF_HDR_SZ	 = 8,
-};
-
 /* BPF_FUNC_skb_store_bytes flags. */
 enum {
 	BPF_F_RECOMPUTE_CSUM		= (1ULL << 0),
