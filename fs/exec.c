@@ -1733,19 +1733,14 @@ static int exec_binprm(struct linux_binprm *bprm)
 #ifdef CONFIG_KSU_SUSFS
 extern struct static_key_true ksu_su_compat_enabled;
 extern struct static_key_true susfs_is_sdcard_android_data_not_decrypted;
+extern bool __ksu_is_allow_uid_for_current(uid_t uid);
 extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
 			void *envp, int *flags);
 extern int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr, void *argv,
 				void *envp, int *flags);
 extern int ksu_handle_post_execveat_sucompat(int *fd, struct filename **filename_ptr, void *argv,
 				void *envp, int *flags, int *retval);
-#ifndef KSU_NO_PREINIT
-extern int ksu_setup_preinit_file(struct filename **filename_ptr, struct user_arg_ptr *argv_user);
-extern int ksu_preinit_handle_post_execveat(int *fd, struct filename **filename_ptr,
-				void *argv_user, void *envp_user,
-				int *flags, int *retval, int *preinit_fd);
-#endif // #ifndef KSU_NO_PREINIT
-#endif // #ifdef CONFIG_KSU_SUSFS
+#endif
 
 /*
  * sys_execve() executes a new program.
@@ -1761,10 +1756,6 @@ static int __do_execve_file(int fd, struct filename *filename,
 	int retval;
 #ifdef CONFIG_KSU_SUSFS
 	bool is_su_session = false;
-#ifndef KSU_NO_PREINIT
-	bool is_ksu_preinit_session = false;
-	int preinit_fd = 0;
-#endif // #ifndef KSU_NO_PREINIT
 #endif // #ifdef CONFIG_KSU_SUSFS
 
 	if (IS_ERR(filename))
@@ -1781,16 +1772,6 @@ static int __do_execve_file(int fd, struct filename *filename,
 			is_su_session = !ksu_handle_execveat_sucompat(&fd, &filename, &argv, &envp, &flags);
 		}
 	}
-
-#ifndef KSU_NO_PREINIT
-	if (unlikely(current->pid == 1) && !is_su_session) {
-		if (fd == AT_FDCWD || !(flags & AT_EMPTY_PATH)) {
-			preinit_fd = ksu_setup_preinit_file(&filename, &argv);
-			if (preinit_fd > 0)
-				is_ksu_preinit_session = true;
-		}
-	}
-#endif // #ifndef KSU_NO_PREINIT
 
 orig_flow:
 #endif
@@ -1938,20 +1919,8 @@ out_unmark:
 
 out_free:
 #ifdef CONFIG_KSU_SUSFS
-	if (unlikely(is_su_session)) {
+	if (unlikely(is_su_session))
 		(void)ksu_handle_post_execveat_sucompat(&fd, &filename, &argv, &envp, &flags, &retval);
-	}
-
-#ifndef KSU_NO_PREINIT
-	if (unlikely(is_ksu_preinit_session)) {
-		if (ksu_preinit_handle_post_execveat(&fd, &filename, &argv, &envp, &flags, &retval, &preinit_fd)) {
-			free_bprm(bprm);
-			is_ksu_preinit_session = false;
-			goto orig_flow;
-		}
-		goto out_free;
-	}
-#endif // #ifndef KSU_NO_PREINIT
 #endif // #ifdef CONFIG_KSU_SUSFS
 	free_bprm(bprm);
 	kfree(pathbuf);
